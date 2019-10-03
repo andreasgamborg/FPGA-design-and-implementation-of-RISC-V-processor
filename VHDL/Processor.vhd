@@ -35,13 +35,13 @@ entity Processor is
 end Processor;
 
 architecture Behavioral of Processor is
-    type debug_state_type is (dLoad, dRun, dDone, dError);
+    type debug_state_type is (dDone, dLoad, dRun, dError);
     signal dState, dState_next : debug_state_type;
     signal flg_ddone : STD_LOGIC;
 -- CPU State
     signal PC, PC_next : STD_LOGIC_VECTOR(63 downto 0);
     type registerFile is array(0 to 31) of STD_LOGIC_VECTOR(63 downto 0);
-    type Mem is array(0 to 255) of STD_LOGIC_VECTOR(7 downto 0);
+    type Mem is array(0 to 1023) of STD_LOGIC_VECTOR(7 downto 0);
     signal registers : registerFile;
     signal d_mem : Mem;
     signal i_mem : Mem;
@@ -170,21 +170,21 @@ begin
     process(all)   -- Output
     begin
         if switch(15) = '0' then
-            led <= std_logic_vector(UART_ptr(7 downto 0)) & i_mem(to_integer(unsigned(switch(4 downto 0))))(7 downto 0);
+            led <= std_logic_vector(UART_ptr(7 downto 0)) & i_mem(to_integer(unsigned(switch(11 downto 0))))(7 downto 0);
         else
             led <= PC(7 downto 0) & registers(to_integer(unsigned(switch(4 downto 0))))(7 downto 0);
         end if;
     end process;
     
-    ifetch_byte0 <= PC(63 downto 2) & "00";
-    ifetch_byte1 <= PC(63 downto 2) & "01";
-    ifetch_byte2 <= PC(63 downto 2) & "10";
-    ifetch_byte3 <= PC(63 downto 2) & "11";
+--    ifetch_byte0 <= PC(63 downto 2) & "00";
+--    ifetch_byte1 <= PC(63 downto 2) & "01";
+--    ifetch_byte2 <= PC(63 downto 2) & "10";
+--    ifetch_byte3 <= PC(63 downto 2) & "11";
 
-    inst <= i_mem(to_integer(unsigned(ifetch_byte3))) & 
-            i_mem(to_integer(unsigned(ifetch_byte2))) & 
-            i_mem(to_integer(unsigned(ifetch_byte1))) & 
-            i_mem(to_integer(unsigned(ifetch_byte0)));
+    inst <= i_mem(to_integer(unsigned(PC(63 downto 2))+3)) & 
+            i_mem(to_integer(unsigned(PC(63 downto 2))+2)) & 
+            i_mem(to_integer(unsigned(PC(63 downto 2))+1)) & 
+            i_mem(to_integer(unsigned(PC(63 downto 2))));
 
     process(clk, sbtn_reset)     -- Clock dependent signals
     begin
@@ -197,10 +197,14 @@ begin
                 registers(to_integer(unsigned(rd))) <= rd_data;
             end if;
             if ctrl_mem_w = '1' then
-                d_mem(to_integer(unsigned(alu_result))) <= rs2_data(31 downto 24);
-                d_mem(to_integer(unsigned(alu_result)+1)) <= rs2_data(23 downto 16);
-                d_mem(to_integer(unsigned(alu_result)+2)) <= rs2_data(15 downto 8);
-                d_mem(to_integer(unsigned(alu_result)+3)) <= rs2_data(7 downto 0);
+                d_mem(to_integer(unsigned(alu_result)))   <= rs2_data(63 downto 56);
+                d_mem(to_integer(unsigned(alu_result)+1)) <= rs2_data(55 downto 48);
+                d_mem(to_integer(unsigned(alu_result)+2)) <= rs2_data(47 downto 40);
+                d_mem(to_integer(unsigned(alu_result)+3)) <= rs2_data(39 downto 32);
+                d_mem(to_integer(unsigned(alu_result)+4)) <= rs2_data(31 downto 24);
+                d_mem(to_integer(unsigned(alu_result)+5)) <= rs2_data(23 downto 16);
+                d_mem(to_integer(unsigned(alu_result)+6)) <= rs2_data(15 downto 8);
+                d_mem(to_integer(unsigned(alu_result)+7)) <= rs2_data(7 downto 0);
             end if;
             if sbtn_reset = '1' then
                 PC <= (others => '0');
@@ -228,7 +232,8 @@ begin
     
     process(all)        --Branch or next
     begin
-    flg_error_branch <= '0';
+        flg_error_branch <= '0';
+        branch <= '0';
         if ctrl_branch = '1' then
             case func3 is
                 when "000" => -- beq
@@ -240,7 +245,6 @@ begin
                 when "101" => --bge
                     branch <= not alu_result(63);    
                 when others =>
-                    branch <= '0';
                     flg_error_branch <= '1';
             end case;
         end if;
@@ -294,7 +298,16 @@ begin
         rs2_data <= registers(to_integer(unsigned(rs2)));
         -- Memory
         if ctrl_mem_r = '1' then
-            mem_data <= registers(to_integer(unsigned(alu_result)));
+            mem_data <= d_mem(to_integer(unsigned(alu_result)+7))   &
+                        d_mem(to_integer(unsigned(alu_result)+6))   &
+                        d_mem(to_integer(unsigned(alu_result)+5))   &
+                        d_mem(to_integer(unsigned(alu_result)+4))   &
+                        d_mem(to_integer(unsigned(alu_result)+3))   &
+                        d_mem(to_integer(unsigned(alu_result)+2))   &
+                        d_mem(to_integer(unsigned(alu_result)+1))   &
+                        d_mem(to_integer(unsigned(alu_result)));
+        else
+            mem_data <= (others => '0');
         end if;
         if ctrl_mem_to_reg = '1' then
             rd_data <= mem_data;
@@ -307,6 +320,7 @@ begin
     begin
         --ALU control
         flg_error_alu <= '0';
+        alu_op <= "1111";
         case ctrl_alu_op is
             when "00" =>                -- Load/Store, use alu to calculate address
                 alu_op <= "0010";
@@ -354,14 +368,15 @@ begin
                 alu_result <= std_logic_vector(unsigned(rs1_data) + unsigned(alu_src));
             when "0110" => --sub
                 alu_result <= std_logic_vector(unsigned(rs1_data) - unsigned(alu_src));
-                if alu_result = x"0000000000000000" then
-                    ctrl_zero <= '1';
-                else
-                    ctrl_zero <= '0';
-                end if;
-            when others => 
+            when others =>
+                alu_result <= (others => '0');
                 flg_error_alu <= '1';
         end case;
+        if alu_result = x"0000000000000000" then
+            ctrl_zero <= '1';
+        else
+            ctrl_zero <= '0';
+        end if;
     end process;
     
     process(all)    -- Immidiate Gen
@@ -395,6 +410,7 @@ begin
             when x"73" => --Format I
                 imm <= ((63 downto 12 => inst(31)) & inst(31 downto 20));          
             when others => 
+                imm <= (others => '0');
                 flg_error_imm <= '1';
         end case;
     end process;

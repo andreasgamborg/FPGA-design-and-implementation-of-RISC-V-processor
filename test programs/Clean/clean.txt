@@ -1,0 +1,1 @@
+Writes 0 to all 32 regiseters
