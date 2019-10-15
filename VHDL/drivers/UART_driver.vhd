@@ -15,7 +15,8 @@ end UART_driver;
 
 architecture Behavioral of UART_driver is
     signal sRsRx : STD_LOGIC;
-    constant CNT_MAX : unsigned(13 downto 0) := d"10417"; --baud 9600
+    --constant CNT_MAX : unsigned(13 downto 0) := d"10417";   --baud 9600 @ 100Hz
+    constant CNT_MAX : unsigned(10 downto 0) := d"1042";    --baud 9600 @ 10Hz
     SIGNAL cnt, cnt_next : unsigned(13 downto 0);
     SIGNAL tick, done : std_logic;
     SIGNAL xdone : std_logic;

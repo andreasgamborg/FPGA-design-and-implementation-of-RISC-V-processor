@@ -23,7 +23,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity Processor is
-    Port (  clk : IN STD_LOGIC;
+    Port (  sysclk : IN STD_LOGIC;
             btn_reset, btn_run, btn_stop, btn_load : IN STD_LOGIC;
             switch :IN STD_LOGIC_VECTOR(15 downto 0);
             led : OUT STD_LOGIC_VECTOR(15 downto 0);
@@ -35,17 +35,25 @@ entity Processor is
 end Processor;
 
 architecture Behavioral of Processor is
+
+    component clk_wiz_0
+        port(
+            clk_in1     : in     std_logic;
+            reset       : in std_logic;
+            clk_out1    : out    std_logic
+        );
+     end component;
+    signal clk : std_logic;
     type debug_state_type is (dDone, dLoad, dRun, dError);
     signal dState, dState_next : debug_state_type;
     signal flg_ddone : STD_LOGIC;
 -- CPU State
     signal PC, PC_next : STD_LOGIC_VECTOR(63 downto 0);
     type registerFile is array(0 to 31) of STD_LOGIC_VECTOR(63 downto 0);
-    type Mem is array(0 to 1023) of STD_LOGIC_VECTOR(7 downto 0);
+    type Mem is array(0 to 255) of STD_LOGIC_VECTOR(7 downto 0);
     signal registers : registerFile;
     signal d_mem : Mem;
     signal i_mem : Mem;
-    signal ifetch_byte0, ifetch_byte1, ifetch_byte2, ifetch_byte3 : STD_LOGIC_VECTOR(63 downto 0);
 -- Instrucion
     signal inst : STD_LOGIC_VECTOR(31 downto 0);
     signal opcode, func7 : STD_LOGIC_VECTOR(6 downto 0);
@@ -70,6 +78,11 @@ architecture Behavioral of Processor is
     signal alu_result : STD_LOGIC_VECTOR(63 downto 0);
     signal alu_src : STD_LOGIC_VECTOR(63 downto 0);
     signal branch : STD_LOGIC;
+    constant c3 : STD_LOGIC_VECTOR(1 downto 0) := "11";
+    constant c2 : STD_LOGIC_VECTOR(1 downto 0) := "10";
+    constant c1 : STD_LOGIC_VECTOR(1 downto 0) := "01";
+    constant c0 : STD_LOGIC_VECTOR(1 downto 0) := "00";
+
 -- Error Flags
     signal flg_error : STD_LOGIC;
     signal flg_error_branch : STD_LOGIC;
@@ -115,6 +128,9 @@ architecture Behavioral of Processor is
     end component;
     signal to_seg7 : std_logic_vector(15 downto 0);
     
+    signal ifetch_byte0, ifetch_byte1, ifetch_byte2, ifetch_byte3 : STD_LOGIC_VECTOR(63 downto 0);
+
+    
 begin
     flg_error <= flg_error_alu or flg_error_ctrl or flg_error_imm or flg_error_branch;
     process(all)   -- State logic
@@ -141,10 +157,9 @@ begin
                     PC_next <= std_logic_vector(unsigned(PC) + 4);
                 end if;
                 UART_ptr_next <= (others => '0');
-                
-                if (flg_error) then
+                if flg_error = '1' then
                     dState_next <= dError;
-                elsif (sbtn_stop or flg_ddone) then
+                elsif (sbtn_stop='1' or flg_ddone='1') then
                     dState_next <= dDone;
                 end if;
             when dDone =>
@@ -152,16 +167,16 @@ begin
                 PC_next <= (others => '0');
                 UART_ptr_next <= (others => '0');
                 
-                if sbtn_run then
+                if sbtn_run='1' then
                     dState_next <= dRun;
-                elsif sbtn_load then
+                elsif sbtn_load='1' then
                     dState_next <= dLoad;
                 end if;
             when dError =>
                 to_seg7 <= x"000e";
                 PC_next <= PC;
                 UART_ptr_next <= (others => '0');
-                if (sbtn_run or sbtn_stop or sbtn_load) then
+                if (sbtn_run='1' or sbtn_stop='1' or sbtn_load='1') then
                     dState_next <= dDone;
                 end if;
         end case;
@@ -175,16 +190,17 @@ begin
             led <= PC(7 downto 0) & registers(to_integer(unsigned(switch(4 downto 0))))(7 downto 0);
         end if;
     end process;
-    
---    ifetch_byte0 <= PC(63 downto 2) & "00";
---    ifetch_byte1 <= PC(63 downto 2) & "01";
---    ifetch_byte2 <= PC(63 downto 2) & "10";
---    ifetch_byte3 <= PC(63 downto 2) & "11";
 
-    inst <= i_mem(to_integer(unsigned(PC(63 downto 2))+3)) & 
-            i_mem(to_integer(unsigned(PC(63 downto 2))+2)) & 
-            i_mem(to_integer(unsigned(PC(63 downto 2))+1)) & 
-            i_mem(to_integer(unsigned(PC(63 downto 2))));
+    ifetch_byte0 <= PC(63 downto 2) & "00";
+    ifetch_byte1 <= PC(63 downto 2) & "01";
+    ifetch_byte2 <= PC(63 downto 2) & "10";
+    ifetch_byte3 <= PC(63 downto 2) & "11";
+
+    inst <= i_mem(to_integer(unsigned(ifetch_byte3))) & 
+            i_mem(to_integer(unsigned(ifetch_byte2))) & 
+            i_mem(to_integer(unsigned(ifetch_byte1))) & 
+            i_mem(to_integer(unsigned(ifetch_byte0)));
+
 
     process(clk, sbtn_reset)     -- Clock dependent signals
     begin
@@ -197,14 +213,14 @@ begin
                 registers(to_integer(unsigned(rd))) <= rd_data;
             end if;
             if ctrl_mem_w = '1' then
-                d_mem(to_integer(unsigned(alu_result)))   <= rs2_data(63 downto 56);
-                d_mem(to_integer(unsigned(alu_result)+1)) <= rs2_data(55 downto 48);
-                d_mem(to_integer(unsigned(alu_result)+2)) <= rs2_data(47 downto 40);
-                d_mem(to_integer(unsigned(alu_result)+3)) <= rs2_data(39 downto 32);
-                d_mem(to_integer(unsigned(alu_result)+4)) <= rs2_data(31 downto 24);
-                d_mem(to_integer(unsigned(alu_result)+5)) <= rs2_data(23 downto 16);
-                d_mem(to_integer(unsigned(alu_result)+6)) <= rs2_data(15 downto 8);
-                d_mem(to_integer(unsigned(alu_result)+7)) <= rs2_data(7 downto 0);
+--                d_mem(to_integer(unsigned(alu_result)))   <= rs2_data(63 downto 56);
+--                d_mem(to_integer(unsigned(alu_result)+1)) <= rs2_data(55 downto 48);
+--                d_mem(to_integer(unsigned(alu_result)+2)) <= rs2_data(47 downto 40);
+--                d_mem(to_integer(unsigned(alu_result)+3)) <= rs2_data(39 downto 32);
+--                d_mem(to_integer(unsigned(alu_result)+4)) <= rs2_data(31 downto 24);
+--                d_mem(to_integer(unsigned(alu_result)+5)) <= rs2_data(23 downto 16);
+--                d_mem(to_integer(unsigned(alu_result)+6)) <= rs2_data(15 downto 8);
+--                d_mem(to_integer(unsigned(alu_result)+7)) <= rs2_data(7 downto 0);
             end if;
             if sbtn_reset = '1' then
                 PC <= (others => '0');
@@ -298,14 +314,14 @@ begin
         rs2_data <= registers(to_integer(unsigned(rs2)));
         -- Memory
         if ctrl_mem_r = '1' then
-            mem_data <= d_mem(to_integer(unsigned(alu_result)+7))   &
-                        d_mem(to_integer(unsigned(alu_result)+6))   &
-                        d_mem(to_integer(unsigned(alu_result)+5))   &
-                        d_mem(to_integer(unsigned(alu_result)+4))   &
-                        d_mem(to_integer(unsigned(alu_result)+3))   &
-                        d_mem(to_integer(unsigned(alu_result)+2))   &
-                        d_mem(to_integer(unsigned(alu_result)+1))   &
-                        d_mem(to_integer(unsigned(alu_result)));
+--            mem_data <= d_mem(to_integer(unsigned(alu_result)+7))   &
+--                        d_mem(to_integer(unsigned(alu_result)+6))   &
+--                        d_mem(to_integer(unsigned(alu_result)+5))   &
+--                        d_mem(to_integer(unsigned(alu_result)+4))   &
+--                        d_mem(to_integer(unsigned(alu_result)+3))   &
+--                        d_mem(to_integer(unsigned(alu_result)+2))   &
+--                        d_mem(to_integer(unsigned(alu_result)+1))   &
+--                        d_mem(to_integer(unsigned(alu_result)));
         else
             mem_data <= (others => '0');
         end if;
@@ -350,6 +366,8 @@ begin
                     when others => 
                         flg_error_alu <= '1';
                 end case;
+            when others => 
+                flg_error_alu <= '1';  
         end case;
         
         -- ALU source
@@ -414,6 +432,14 @@ begin
                 flg_error_imm <= '1';
         end case;
     end process;
+    
+            
+    clk_wiz_0_inst : clk_wiz_0
+        port map(
+            reset => btn_reset,
+            clk_in1 => sysclk,
+            clk_out1 => clk
+        );
     
     Input : Input_driver 
         port map(
