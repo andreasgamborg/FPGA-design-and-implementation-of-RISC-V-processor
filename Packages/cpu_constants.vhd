@@ -22,18 +22,39 @@ package cpu_constants is
     constant PC_base :          std_logic_vector(31 downto 0) := x"00000000";
     
     --Memory
-    constant memory_ROM :       std_logic_vector(31 downto 0) := x"00000010";
-    constant memory_keybord :   std_logic_vector(31 downto 0) := x"00000080";
+    -- Sizes are in registers of 32-bit
+    constant memory_size :          integer := 2**10;
     
-    constant memory_UART_out :      std_logic_vector(31 downto 0) := x"00000084";
-    constant memory_UART_in :       std_logic_vector(31 downto 0) := x"00000088";
-    constant memory_video_low :     std_logic_vector(31 downto 0) := x"0000008c";
-    constant memory_video_high :    std_logic_vector(31 downto 0) := x"00000180";
-    constant memory_LED :           std_logic_vector(31 downto 0) := x"00000184";
+    constant memory_ROM_addr :      integer := 0;
+    constant memory_ROM_size :      integer := 256;
+    constant memory_BTN_addr :      integer := memory_ROM_addr + memory_ROM_size;
+    constant memory_BTN_size :      integer := 1;
+    constant memory_Keyboard_addr : integer := memory_BTN_addr + memory_BTN_size;
+    constant memory_Keyboard_size : integer := 1;
+    constant memory_UART_addr :     integer := memory_Keyboard_addr + memory_Keyboard_size;
+    constant memory_UART_size :     integer := 2;
+    constant memory_video_addr :    integer := memory_UART_addr + memory_UART_size;
+    constant memory_video_size :    integer := 301;
+    constant memory_LED_addr :      integer := memory_video_addr + memory_video_size;
+    constant memory_LED_size :      integer := 1;
+    constant memory_SEG7_addr :     integer := memory_LED_addr + memory_LED_size;
+    constant memory_SEG7_size :     integer := 1;
+    constant memory_data_addr :     integer := memory_SEG7_addr + memory_SEG7_size;
+    constant memory_data_size :     integer := memory_size-memory_data_addr;
     
+    -- Every rgister below UART out is READ ONLY
+    constant memory_read_only :     integer := memory_UART_addr;
+
+    
+--    constant memory_Keyboard_addr :      std_logic_vector(31 downto 0) := x"00000184";
+--    constant memory_UARTo_addr :      std_logic_vector(31 downto 0) := x"00000084";
+--    constant memory_UARTi_addr :       std_logic_vector(31 downto 0) := x"00000088";
+--    constant memory_video_addr :         std_logic_vector(31 downto 0) := x"0000008c";
+--    constant memory_LED_addr :           std_logic_vector(31 downto 0) := x"00000184";
+--    constant memory_SEG7_addr :          std_logic_vector(31 downto 0) := x"00000184";
+
     --Interfaces
     
-    type interface_VGA is array (0 to 239) of STD_LOGIC_VECTOR (31 downto 0); --240 registers needed 8 x 5char x 30lines
-    type interface_UART is array (0 to 2) of STD_LOGIC_VECTOR (31 downto 0);
+    type interface_VGA is array (0 to memory_video_size-1) of STD_LOGIC_VECTOR (31 downto 0); --301 registers needed 10 x 4char x 30lines
 
 end package cpu_constants;

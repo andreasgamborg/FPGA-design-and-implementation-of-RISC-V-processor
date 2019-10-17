@@ -1,24 +1,27 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+
 library work;
 use work.Display.all;
+use work.cpu_constants.all;
 
-entity vga_ctrl is
-    Port ( clk : in STD_LOGIC;
-           reset : in STD_LOGIC;
-           disp_char : in STD_LOGIC_VECTOR(5 downto 0);
-           disp_pos_H : out STD_LOGIC_VECTOR(9 downto 0);
-           disp_pos_V : out STD_LOGIC_VECTOR(9 downto 0);
-           VGA_HS_OUT : out STD_LOGIC;
-           VGA_VS_OUT : out STD_LOGIC;
-           VGA_RED_OUT : out STD_LOGIC_VECTOR (3 downto 0);
-           VGA_BLUE_OUT : out STD_LOGIC_VECTOR (3 downto 0);
-           VGA_GREEN_OUT : out STD_LOGIC_VECTOR (3 downto 0)
+entity VGA_driver is
+    Port ( clk :            in STD_LOGIC;
+           reset :          in STD_LOGIC;
+--           disp_char :      in STD_LOGIC_VECTOR(5 downto 0);
+--           disp_pos_H :     out STD_LOGIC_VECTOR(9 downto 0);
+--           disp_pos_V :     out STD_LOGIC_VECTOR(9 downto 0);
+           VGA_IN :         IN interface_VGA;
+           VGA_HS_OUT :     out STD_LOGIC;
+           VGA_VS_OUT :     out STD_LOGIC;
+           VGA_RED_OUT :    out STD_LOGIC_VECTOR (3 downto 0);
+           VGA_BLUE_OUT :   out STD_LOGIC_VECTOR (3 downto 0);
+           VGA_GREEN_OUT :  out STD_LOGIC_VECTOR (3 downto 0)
     );
-end vga_ctrl;
+end VGA_driver;
 
-architecture Behavioral of vga_ctrl is
+architecture Behavioral of VGA_driver is
 
     signal count_pixel, count_pixel_next : unsigned(5 downto 0) := (others => '0');    
     signal count_H, count_H_next : unsigned(9 downto 0) := (others => '0');
@@ -26,6 +29,9 @@ architecture Behavioral of vga_ctrl is
 
     signal flg_pixel_clk, HS, VS, HAct, VAct, Act, c_bit : std_logic;
     
+    signal disp_char4 : STD_LOGIC_VECTOR(31 downto 0);
+    signal disp_char : STD_LOGIC_VECTOR(7 downto 0);
+
 begin
         
     flg_pixel_clk <= '1' when (count_pixel = "0011") else '0';
@@ -78,10 +84,22 @@ begin
     VAct <= '1' when (count_V < DISP_HEIGHT)
               else '0';
     Act  <= HAct and VAct;
-    
-    
---    c_char <= Frame(to_integer(count_V(9 downto 4)), to_integer(count_H(9 downto 4)));
-    
+        
+    process(all)
+    begin
+        disp_char4 <= VGA_IN(to_integer(count_V(9 downto 4))*8+to_integer(count_H(9 downto 6)));
+        case count_H(5 downto 4) is
+            when "00" =>
+                disp_char <= disp_char4(7 downto 0);
+            when "01" =>
+                disp_char <= disp_char4(15 downto 8);
+            when "10" =>
+                disp_char <= disp_char4(23 downto 16);
+            when "11" =>
+                disp_char <= disp_char4(31 downto 24);
+        end case;
+    end process;
+
     c_bit <= Char_ROM(to_integer(unsigned(disp_char(5 downto 4))&count_V(3 downto 0)), to_integer(unsigned(disp_char(3 downto 0))&count_H(3 downto 0)));
       
     
@@ -115,6 +133,4 @@ begin
     end process;
     VGA_HS_OUT <= HS;
     VGA_VS_OUT <= VS;
-    disp_pos_H <= std_logic_vector(count_H);
-    disp_pos_V <= std_logic_vector(count_V);
 end Behavioral;

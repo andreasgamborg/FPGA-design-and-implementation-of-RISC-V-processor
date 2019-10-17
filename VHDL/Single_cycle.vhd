@@ -17,8 +17,8 @@ entity Processor is
         --Imem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
         --Imem_r_w_out: OUT STD_LOGIC;
         Imem_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
-        --Imem_valid_out: OUT STD_LOGIC;
-        --Imem_ready_in: IN STD_LOGIC;
+        Imem_valid_out: OUT STD_LOGIC;
+        Imem_ready_in: IN STD_LOGIC;
         --Dmem interface
         Dmem_addr_out: OUT STD_LOGIC_VECTOR(31 downto 0);
         Dmem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
@@ -78,6 +78,7 @@ architecture Behavioral of Processor is
     PC4 <= std_logic_vector(unsigned(PC) + 4);
     inst <= Imem_data_in;
     Imem_addr_out <= PC;
+    Imem_valid_out <= '1';
     process(clk, reset)     -- Clocked signals
     begin
         if reset = '1' then
@@ -106,7 +107,6 @@ architecture Behavioral of Processor is
             when others =>
                 PC_next <= PC_base;
         end case;
-        
     end process;
     
     process(all)    -- Cutting up instruction
@@ -269,20 +269,32 @@ architecture Behavioral of Processor is
         flg_error_alu <= '0';
         alu_op <= "1111";
         case ctrl_alu_op is
-            when "00" =>                -- Load/Store, use alu to calculate address
+            when "00" =>                -- Load/Store ect., use alu to calculate address
                 alu_op <= "0010";
             when "01" =>                -- Branch
                 alu_op <= "0110";
             when "10" =>                -- Its an R-instruction
                 case func7(5)&func3 is 
-                    when "0000" =>
+                    when "0000" =>  --add
                         alu_op <= "0010";
-                    when "1000" =>
+                    when "1000" =>  --sub
                         alu_op <= "0110";
-                    when "0111" =>
-                        alu_op <= "0000";
-                    when "0110" =>
-                        alu_op <= "0001";
+                    when "0001" =>  --sll
+                        alu_op <= "1000";
+--                    when "0010" =>  --slt
+--                        alu_op <= "";
+--                    when "0011" =>  --sltu
+--                        alu_op <= "";    
+                    when "0100" =>  --xor
+                        alu_op <= "0111";    
+                    when "0101" =>  --srl
+                        alu_op <= "1100";
+                    when "1101" =>  --sra
+                        alu_op <= "1101";
+                    when "0110" =>  --or
+                        alu_op <= "0001";          
+                    when "0111" =>  --and
+                        alu_op <= "0000";                        
                     when others => 
                         flg_error_alu <= '1';
                 end case;
@@ -290,10 +302,25 @@ architecture Behavioral of Processor is
                 case func3 is 
                     when "000" => --addi
                         alu_op <= "0010";
+                    when "001" => --slli
+                        alu_op <= "1000"; 
+--                    when "010" => --slti
+--                        alu_op <= "";         
+--                    when "011" => --sltiu
+--                        alu_op <= "";   
+                    when "100" => --xori
+                        alu_op <= "0111";   
+                    when "101" => --sr(l/a)i
+                        if func7(5) = '1' then  --srai
+                            alu_op <= "1101";   
+                        else
+                            alu_op <= "1100";       --srli
+                        end if;
+                    when "110" => --ori
+                        alu_op <= "0001";                
                     when "111" => --andi
                         alu_op <= "0000";
-                    when "110" => --ori
-                        alu_op <= "0001";
+
                     when others => 
                         flg_error_alu <= '1';
                 end case;
@@ -301,7 +328,7 @@ architecture Behavioral of Processor is
                 flg_error_alu <= '1';  
         end case;
         
-        -- ALU sources
+        -- ALU source multiplexers
         if ctrl_alu_src_a_sel = '1' then
             alu_src_a <= PC;
         else
@@ -322,6 +349,14 @@ architecture Behavioral of Processor is
                 alu_result <= std_logic_vector(unsigned(alu_src_a) + unsigned(alu_src_b));
             when "0110" => --sub
                 alu_result <= std_logic_vector(unsigned(alu_src_a) - unsigned(alu_src_b));
+            when "0111" => --XOR
+                alu_result <= alu_src_a xor alu_src_b;
+            when "1000" => --shift left (5bit)
+                alu_result <= std_logic_vector(shift_left(unsigned(alu_src_a), to_integer(unsigned(alu_src_b(4 downto 0)))));
+            when "1100" => --shift right (5bit)
+                alu_result <= std_logic_vector(shift_right(unsigned(alu_src_a), to_integer(unsigned(alu_src_b(4 downto 0)))));
+            when "1101" => --shift right arithmetic (5bit)
+                alu_result <= std_logic_vector(shift_right(signed(alu_src_a), to_integer(unsigned(alu_src_b(4 downto 0))))); 
             when others =>
                 alu_result <= (others => '0');
                 flg_error_alu <= '1';

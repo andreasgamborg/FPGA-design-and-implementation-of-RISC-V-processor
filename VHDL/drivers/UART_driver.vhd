@@ -4,87 +4,72 @@ use IEEE.NUMERIC_STD.ALL;
 
 
 entity UART_driver is
+    generic(
+        clk_freq :      integer := 100e6; -- Hz
+        baud :          integer := 9600; -- bits per sec
+        packet_length : integer := 10   -- bits
+    );
     Port (  
         clk : IN STD_LOGIC;
+        reset :IN STD_LOGIC;
         RsRx : IN STD_LOGIC;
         RsTx : OUT STD_LOGIC;
-        done_flg : OUT STD_LOGIC;
-        payload : OUT std_logic_vector(7 downto 0)
+        payload_in : IN std_logic_vector(31 downto 0);
+        payload_out : OUT std_logic_vector(31 downto 0)
     );
 end UART_driver;
 
 architecture Behavioral of UART_driver is
-    signal sRsRx : STD_LOGIC;
+    signal sRx, Rx: STD_LOGIC;
     --constant CNT_MAX : unsigned(13 downto 0) := d"10417";   --baud 9600 @ 100Hz
-    constant CNT_MAX : unsigned(10 downto 0) := d"1042";    --baud 9600 @ 10Hz
-    SIGNAL cnt, cnt_next : unsigned(13 downto 0);
-    SIGNAL tick, done : std_logic;
-    SIGNAL xdone : std_logic;
+    --constant CNT_MAX : unsigned(10 downto 0) := d"1042";    --baud 9600 @ 10Hz
+    constant CNT_MAX : integer := clk_freq/baud;
 
-    type state_type is (Idle, Read);
-    signal state, next_state : state_type;
-    signal packet : std_logic_vector(9 downto 0);
-    constant packet_length : unsigned(3 downto 0) := d"10";
-    SIGNAL tick_cnt, tick_cnt_next : unsigned(3 downto 0);
+    signal enable_tick_cnt, enable_tick_cnt_next : unsigned(31 downto 0);
+    signal enable_tick : std_logic;
+    
+    signal bit_cnt, bit_cnt_next : unsigned(3 downto 0);
+
+    signal Rx_packet : std_logic_vector(9 downto 0);
+    signal Rx_packet_done : std_logic;  
+    signal Rx_idle: std_logic;  
     
 begin
-    done <= '1' when (tick_cnt = packet_length) else '0';
-    tick <= '1' when (cnt = CNT_MAX) else '0';
-
+    enable_tick <= '1' when (enable_tick_cnt = CNT_MAX) else '0';
+    Rx_idle <= '1' when (Rx_packet = "1111111111") else '0';
+    Rx_packet_done <= '1' when  ((bit_cnt = packet_length-1) and (Rx_idle = '0')) else '0';
+    
     process(all) -- Set Next
     begin
-        if tick = '1' then
-            cnt_next <= (others => '0');
+        if enable_tick = '1' then
+            enable_tick_cnt_next <= (others => '0');
+             if (Rx_packet_done = '1' or Rx_idle = '1') then
+                bit_cnt_next <= (others => '0');
+            else
+                bit_cnt_next <= bit_cnt+1;
+            end if;
         else
-            cnt_next <= cnt+1;
+            enable_tick_cnt_next <= enable_tick_cnt+1;
+            bit_cnt_next <= bit_cnt;
         end if;
-        if done = '1' then
-            tick_cnt_next <= (others => '0');
-        elsif state = Read then
-            tick_cnt_next <= tick_cnt+1;
-        else
-            tick_cnt_next <= tick_cnt;
+    end process;
+    
+    process(all) -- Update
+    begin
+        if reset = '1' then
+            enable_tick_cnt <= (others => '0');
+            bit_cnt <= (others => '0');
+        elsif rising_edge(clk) then
+            sRx <= RsRx;
+            Rx <= sRx;
+            enable_tick_cnt <= enable_tick_cnt_next;
+            bit_cnt <= bit_cnt_next;
+            if enable_tick = '1' then
+                Rx_packet <= Rx & Rx_packet(9 downto 1);
+            end if; 
         end if;
     end process;
 
-    process(all) -- Update
-    begin
-        if rising_edge(clk) then
-            sRsRx <= RsRx;
-            cnt <= cnt_next;
-            state <= next_state;
-            if tick = '1' then
-                tick_cnt <= tick_cnt_next;
-            end if;
-                     
-            if state = Read then
-                if tick = '1' then
-                    packet <= sRsRx & packet(9 downto 1);
-                end if;         
-            end if;
-            xdone <= done;
-        end if;
-    end process;
-    
-    process(all) -- State Logic
-    begin
-        case state is
-            when Idle =>
-                if sRsRx = '0' then
-                    next_state <= Read;
-                else
-                    next_state <= Idle;
-                end if;
-            when Read =>
-                if done = '1' then
-                    next_state <= Idle;
-                else
-                    next_state <= Read;
-                end if;
-        end case;
-    end process;
-    
-    done_flg <= done and (not xdone);
-    payload <= packet(8 downto 1);
-    RsTx <= sRsRx;
+    payload_out <= (31 downto 17 => '0')& Rx_packet_done & (15 downto 8 => '0') & Rx_packet(8 downto 1);
+    RsTx <= Rx;
 end Behavioral;

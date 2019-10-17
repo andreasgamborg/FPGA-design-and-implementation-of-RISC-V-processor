@@ -28,37 +28,56 @@ use work.cpu_constants.all;
 
 entity Memory_driver is
     Port(
-        -- CPU
-        addr_in: IN STD_LOGIC_VECTOR(31 downto 0);
-        data_in: IN STD_LOGIC_VECTOR(31 downto 0);
-        r_w_in: IN STD_LOGIC;                       --0:read 1:write
-        valid_in: IN STD_LOGIC;
-        data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-        ready_out: OUT STD_LOGIC;
-        -- Dmem
-        dmem_addr_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-        dmem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-        dmem_r_w_out: OUT STD_LOGIC;                       --0:read 1:write
-        dmem_valid_out: OUT STD_LOGIC;
-        dmem_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
-        dmem_ready_in: IN STD_LOGIC;
-        
-        led_addr_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-        led_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-        led_r_w_out: OUT STD_LOGIC;                       --0:read 1:write
-        led_valid_out: OUT STD_LOGIC;
-        led_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
-        led_ready_in: IN STD_LOGIC
+        --Dmem
+        Dmem_addr_in: IN STD_LOGIC_VECTOR(31 downto 0);
+        Dmem_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
+        Dmem_r_w_in: IN STD_LOGIC;                       --0:read 1:write
+        Dmem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
+        Dmem_valid_in: IN STD_LOGIC;
+        Dmem_ready_out: OUT STD_LOGIC;
+        --Imem
+        Imem_addr_in: IN STD_LOGIC_VECTOR(31 downto 0);
+        Imem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
+        Imem_valid_in: IN STD_LOGIC;
+        Imem_ready_out: OUT STD_LOGIC;
+        -- MMIO
+        mem_addr_in: OUT STD_LOGIC_VECTOR(31 downto 0);
+        mem_data_in: OUT STD_LOGIC_VECTOR(31 downto 0);
+        mem_r_w_in: OUT STD_LOGIC;                       --0:read 1:write
+        mem_data_out: IN STD_LOGIC_VECTOR(31 downto 0);
+        mem_valid_in: OUT STD_LOGIC;
+        mem_ready_out: IN STD_LOGIC
     );
 end Memory_driver;
 
 architecture Behavioral of Memory_driver is
 
 begin
-
+    
     process(all)
     begin
+        mem_addr_in <= (others => '0');
+        mem_data_in <= (others => '0');
+        mem_r_w_in <= '0';
         
+        Imem_ready_out <= mem_ready_out;
+        Imem_data_out <= mem_data_out;
+
+        Dmem_ready_out <= mem_ready_out;
+        Dmem_data_out <= mem_data_out;
+
+        if Dmem_valid_in = '1' then
+            mem_addr_in <= Dmem_addr_in;
+            mem_data_in <= Dmem_data_in;
+            mem_r_w_in <=  Dmem_r_w_in;
+            mem_valid_in <= '1';
+            Imem_ready_out <= '0';
+        elsif Dmem_valid_in = '1' then
+            mem_addr_in <= Imem_addr_in;
+            mem_valid_in <= '1';
+        else
+            mem_valid_in <= '0';
+        end if;
     end process;
 
 end Behavioral;
