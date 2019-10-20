@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="Memory_bench_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="Memory_bench" />
+            <top_module name="cpu_constants" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="102388166667fs"></ZoomStartTime>
+      <ZoomEndTime time="103959166668fs"></ZoomEndTime>
+      <Cursor1Time time="102850000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="175"></NameColumnWidth>
+      <ValueColumnWidth column_width="130"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="18" />
+   <wvobject fp_name="/Memory_bench/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/addr_in" type="array">
+      <obj_property name="ElementShortName">addr_in[31:0]</obj_property>
+      <obj_property name="ObjectShortName">addr_in[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/Mem/addr" type="other">
+      <obj_property name="ElementShortName">addr</obj_property>
+      <obj_property name="ObjectShortName">addr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/data_in" type="array">
+      <obj_property name="ElementShortName">data_in[31:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/r_w_in" type="logic">
+      <obj_property name="ElementShortName">r_w_in</obj_property>
+      <obj_property name="ObjectShortName">r_w_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/data_out" type="array">
+      <obj_property name="ElementShortName">data_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">data_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/valid_in" type="logic">
+      <obj_property name="ElementShortName">valid_in</obj_property>
+      <obj_property name="ObjectShortName">valid_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/ready_out" type="logic">
+      <obj_property name="ElementShortName">ready_out</obj_property>
+      <obj_property name="ObjectShortName">ready_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/led_out" type="array">
+      <obj_property name="ElementShortName">led_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">led_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/vga_out" type="array">
+      <obj_property name="ElementShortName">vga_out[0:300][31:0]</obj_property>
+      <obj_property name="ObjectShortName">vga_out[0:300][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/uart_in" type="array">
+      <obj_property name="ElementShortName">uart_in[31:0]</obj_property>
+      <obj_property name="ObjectShortName">uart_in[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/uart_out" type="array">
+      <obj_property name="ElementShortName">uart_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">uart_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/btn_in" type="array">
+      <obj_property name="ElementShortName">btn_in[31:0]</obj_property>
+      <obj_property name="ObjectShortName">btn_in[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/keyboard_in" type="array">
+      <obj_property name="ElementShortName">keyboard_in[31:0]</obj_property>
+      <obj_property name="ObjectShortName">keyboard_in[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/seg7_out" type="array">
+      <obj_property name="ElementShortName">seg7_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">seg7_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/Mem/Memory_error_OutOfBound" type="logic">
+      <obj_property name="ElementShortName">Memory_error_OutOfBound</obj_property>
+      <obj_property name="ObjectShortName">Memory_error_OutOfBound</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Memory_bench/Mem/Memory_error_ReadOnly" type="logic">
+      <obj_property name="ElementShortName">Memory_error_ReadOnly</obj_property>
+      <obj_property name="ObjectShortName">Memory_error_ReadOnly</obj_property>
+   </wvobject>
+</wave_config>

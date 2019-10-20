@@ -3,9 +3,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 library work;
-use work.cpu_constants.all;
+use work.static.all;
 
-entity RAM is
+entity Memory is
     Port(
         clk : IN STD_LOGIC;
         reset : IN STD_LOGIC;
@@ -24,9 +24,9 @@ entity RAM is
         keyboard_in : IN STD_LOGIC_VECTOR(31 downto 0);
         seg7_out : OUT STD_LOGIC_VECTOR(31 downto 0)
     );
-end RAM;
+end Memory;
 
-architecture Behavioral of RAM is
+architecture Behavioral of Memory is
 
     type RAM is array(memory_BTN_addr to memory_size) of STD_LOGIC_VECTOR(31 downto 0);
     signal Dmem : RAM;

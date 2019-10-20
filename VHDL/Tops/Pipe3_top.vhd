@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.ALL;
 library work;
 use work.static.all;
 
-entity Single_cycle_top is
+entity Pipe3_top is
     Port (  
         clk : IN STD_LOGIC;
         basys3_switch : IN STD_LOGIC_VECTOR(15 downto 0);
@@ -24,9 +24,9 @@ entity Single_cycle_top is
         VGA_BLUE_OUT : OUT STD_LOGIC_VECTOR (3 downto 0);
         VGA_GREEN_OUT : OUT STD_LOGIC_VECTOR (3 downto 0)
     );
-end Single_cycle_top;
+end Pipe3_top;
 
-architecture Behavioral of Single_cycle_top is
+architecture Behavioral of Pipe3_top is
     signal reset : STD_LOGIC;
     component Processor is
         Port(  

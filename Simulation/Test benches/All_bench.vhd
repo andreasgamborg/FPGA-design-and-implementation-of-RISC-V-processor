@@ -5,35 +5,36 @@ use IEEE.NUMERIC_STD.ALL;
 library work;
 use work.static.all;
 
-entity Single_cycle_top is
-    Port (  
-        clk : IN STD_LOGIC;
-        basys3_switch : IN STD_LOGIC_VECTOR(15 downto 0);
-        basys3_btn : IN STD_LOGIC_VECTOR(4 downto 0);
-        basys3_pbtn : IN STD_LOGIC_VECTOR(3 downto 0);
-        PS2Clk, PS2Data : IN STD_LOGIC;
-        RsRx : IN STD_LOGIC;
-        
-        RsTx : OUT STD_LOGIC;
-        basys3_led : OUT STD_LOGIC_VECTOR(15 downto 0);
-        basys3_seg7 : OUT STD_LOGIC_VECTOR(7 downto 0);
-        basys3_an : OUT STD_LOGIC_VECTOR(3 downto 0);
-        VGA_HS_OUT : OUT STD_LOGIC;
-        VGA_VS_OUT : OUT STD_LOGIC;
-        VGA_RED_OUT : OUT STD_LOGIC_VECTOR (3 downto 0);
-        VGA_BLUE_OUT : OUT STD_LOGIC_VECTOR (3 downto 0);
-        VGA_GREEN_OUT : OUT STD_LOGIC_VECTOR (3 downto 0)
-    );
-end Single_cycle_top;
+entity All_bench is
+end All_bench;
 
-architecture Behavioral of Single_cycle_top is
-    signal reset : STD_LOGIC;
+architecture Behavioral of All_bench is
+    signal clk : STD_LOGIC := '0';
+    signal reset : STD_LOGIC := '1';
+
+    signal basys3_switch :  STD_LOGIC_VECTOR(15 downto 0);
+    signal basys3_btn :  STD_LOGIC_VECTOR(4 downto 0);
+    signal basys3_pbtn :  STD_LOGIC_VECTOR(3 downto 0);
+    signal PS2Clk, PS2Data : STD_LOGIC;
+    signal RsRx, RsTx : STD_LOGIC;
+    
+    signal basys3_led : STD_LOGIC_VECTOR(15 downto 0);
+    signal basys3_seg7 : STD_LOGIC_VECTOR(7 downto 0);
+    signal basys3_an :  STD_LOGIC_VECTOR(3 downto 0);
+    signal VGA_HS_OUT :  STD_LOGIC;
+    signal VGA_VS_OUT :  STD_LOGIC;
+    signal VGA_RED_OUT :  STD_LOGIC_VECTOR (3 downto 0);
+    signal VGA_BLUE_OUT :  STD_LOGIC_VECTOR (3 downto 0);
+    signal VGA_GREEN_OUT :  STD_LOGIC_VECTOR (3 downto 0);
+   
     component Processor is
         Port(  
             clk : IN STD_LOGIC;
             reset : IN STD_LOGIC;
             --Imem interface
             Imem_addr_out: OUT STD_LOGIC_VECTOR(31 downto 0);
+            Imem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
+            Imem_r_w_out: OUT STD_LOGIC;
             Imem_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
             Imem_valid_out: OUT STD_LOGIC;
             Imem_ready_in: IN STD_LOGIC;
@@ -49,17 +50,19 @@ architecture Behavioral of Single_cycle_top is
         );
     end component;
     
-        signal Dmem_addr:  STD_LOGIC_VECTOR(31 downto 0);
-        signal Dmem_data_in:  STD_LOGIC_VECTOR(31 downto 0);
-        signal Dmem_r_w:  STD_LOGIC;                       --0:read 1:write
-        signal Dmem_data_out:  STD_LOGIC_VECTOR(31 downto 0);
-        signal Dmem_valid:  STD_LOGIC;
-        signal Dmem_ready:  STD_LOGIC;
+        signal Dmem_addr:       STD_LOGIC_VECTOR(31 downto 0);
+        signal Dmem_data_in:    STD_LOGIC_VECTOR(31 downto 0);
+        signal Dmem_r_w:        STD_LOGIC;                       --0:read 1:write
+        signal Dmem_data_out:   STD_LOGIC_VECTOR(31 downto 0);
+        signal Dmem_valid:      STD_LOGIC;
+        signal Dmem_ready:      STD_LOGIC;
             
-        signal Imem_addr:   STD_LOGIC_VECTOR(31 downto 0);
-        signal Imem_data:    STD_LOGIC_VECTOR(31 downto 0);
-        signal Imem_valid:  STD_LOGIC;
-        signal Imem_ready:   STD_LOGIC;
+        signal Imem_addr:       STD_LOGIC_VECTOR(31 downto 0);
+        signal Imem_data_in:    STD_LOGIC_VECTOR(31 downto 0);
+        signal Imem_r_w:        STD_LOGIC;
+        signal Imem_data_out:   STD_LOGIC_VECTOR(31 downto 0);
+        signal Imem_valid:      STD_LOGIC;
+        signal Imem_ready:      STD_LOGIC;
     
     component Memory_driver is
         Port(
@@ -71,9 +74,11 @@ architecture Behavioral of Single_cycle_top is
             Dmem_valid_in: IN STD_LOGIC;
             Dmem_ready_out: OUT STD_LOGIC;
             --Imem
-            Imem_addr_in: IN STD_LOGIC_VECTOR(31 downto 0);
-            Imem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-            Imem_valid_in: IN STD_LOGIC;
+            Imem_addr_in:   IN STD_LOGIC_VECTOR(31 downto 0);
+            Imem_data_in:   IN STD_LOGIC_VECTOR(31 downto 0);
+            Imem_r_w_in:    IN STD_LOGIC;
+            Imem_data_out:  OUT STD_LOGIC_VECTOR(31 downto 0);
+            Imem_valid_in:  IN STD_LOGIC;
             Imem_ready_out: OUT STD_LOGIC;
             -- MMIO
             mem_addr_in: OUT STD_LOGIC_VECTOR(31 downto 0);
@@ -186,7 +191,6 @@ architecture Behavioral of Single_cycle_top is
     end component;
           
 begin
-    reset <= basys3_btn(0);
     
     CPU : Processor 
     port map(
@@ -195,7 +199,9 @@ begin
         reset           => reset, 
     --Imem        
         Imem_addr_out   => Imem_addr,
-        Imem_data_in    => Imem_data,
+        Imem_data_out   => Imem_data_in, 
+        Imem_r_w_out    => Imem_r_w,
+        Imem_data_in    => Imem_data_out,
         Imem_valid_out  => Imem_valid,
         Imem_ready_in   => Imem_ready,
     --Dmem        
@@ -217,9 +223,11 @@ begin
         Dmem_data_out   =>  Dmem_data_out, 
         Dmem_valid_in   =>  Dmem_valid, 
         Dmem_ready_out  =>  Dmem_ready,
-    --Imem                       
+    --Imem        
         Imem_addr_in    =>  Imem_addr,  
-        Imem_data_out   =>  Imem_data, 
+        Imem_data_in    =>  Imem_data_in,
+        Imem_r_w_in     =>  Imem_r_w, 
+        Imem_data_out   =>  Imem_data_out,
         Imem_valid_in   =>  Imem_valid, 
         Imem_ready_out  =>  Imem_ready,
     -- mem
@@ -306,5 +314,12 @@ begin
         seg7_out        => basys3_seg7, 
         an_out          => basys3_an
     ); 
-
+    clk <= not clk after 50 ns;
+    
+    process is
+    begin
+        wait for 200ns;
+        reset <= '0';
+    end process;
+    
 end Behavioral;

@@ -3,14 +3,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 library work;
-use work.cpu_constants.all;
+use work.static.all;
 
 entity Memory_bench is
 end Memory_bench;
 
 architecture Behavioral of Memory_bench is
     
-    component RAM is
+    component Memory is
         Port(
             clk : IN STD_LOGIC;
             reset : IN STD_LOGIC;
@@ -47,7 +47,7 @@ architecture Behavioral of Memory_bench is
     signal   keyboard_in : STD_LOGIC_VECTOR(31 downto 0);
     signal   seg7_out    : STD_LOGIC_VECTOR(31 downto 0);
 begin
-    Mem : RAM
+    Mem : Memory
         port map(
         --  PORT            => SIGNAL
             --CPU

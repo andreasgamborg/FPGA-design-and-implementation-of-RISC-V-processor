@@ -3,8 +3,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 library work;
-use work.Display.all;
-use work.cpu_constants.all;
+use work.display.all;
+use work.static.all;
 
 entity VGA_driver is
     Port ( clk :            in STD_LOGIC;
@@ -97,6 +97,8 @@ begin
                 disp_char <= disp_char4(23 downto 16);
             when "11" =>
                 disp_char <= disp_char4(31 downto 24);
+            when others =>
+                disp_char <= (others => '0');
         end case;
     end process;
 

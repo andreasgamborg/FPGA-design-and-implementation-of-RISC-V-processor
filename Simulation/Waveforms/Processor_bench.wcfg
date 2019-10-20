@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="Processor_bench_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="Processor_bench" />
+            <top_module name="static" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="578000001fs"></ZoomEndTime>
+      <Cursor1Time time="699833000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="355"></NameColumnWidth>
+      <ValueColumnWidth column_width="365"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="7" />
+   <wvobject fp_name="/Processor_bench/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/Processor_bench/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="group13" type="group">
+      <obj_property name="label">I/O</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/Processor_bench/Imem_addr_out" type="array">
+         <obj_property name="ElementShortName">Imem_addr_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Imem_addr_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/Imem_data_in" type="array">
+         <obj_property name="ElementShortName">Imem_data_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Imem_data_in[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/Imem_valid_out" type="logic">
+         <obj_property name="ElementShortName">Imem_valid_out</obj_property>
+         <obj_property name="ObjectShortName">Imem_valid_out</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/Imem_ready_in" type="logic">
+         <obj_property name="ElementShortName">Imem_ready_in</obj_property>
+         <obj_property name="ObjectShortName">Imem_ready_in</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/Dmem_addr_out" type="array">
+         <obj_property name="ElementShortName">Dmem_addr_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Dmem_addr_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/Dmem_data_out" type="array">
+         <obj_property name="ElementShortName">Dmem_data_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Dmem_data_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/Dmem_r_w_out" type="logic">
+         <obj_property name="ElementShortName">Dmem_r_w_out</obj_property>
+         <obj_property name="ObjectShortName">Dmem_r_w_out</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/Dmem_data_in" type="array">
+         <obj_property name="ElementShortName">Dmem_data_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">Dmem_data_in[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/Dmem_valid_out" type="logic">
+         <obj_property name="ElementShortName">Dmem_valid_out</obj_property>
+         <obj_property name="ObjectShortName">Dmem_valid_out</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/Dmem_ready_in" type="logic">
+         <obj_property name="ElementShortName">Dmem_ready_in</obj_property>
+         <obj_property name="ObjectShortName">Dmem_ready_in</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group80" type="group">
+      <obj_property name="label">Stage I</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/Processor_bench/CPU/PC_I" type="array">
+         <obj_property name="ElementShortName">PC_I[31:0]</obj_property>
+         <obj_property name="ObjectShortName">PC_I[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/PC_next" type="array">
+         <obj_property name="ElementShortName">PC_next[31:0]</obj_property>
+         <obj_property name="ObjectShortName">PC_next[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/inst_I" type="array">
+         <obj_property name="ElementShortName">inst_I[31:0]</obj_property>
+         <obj_property name="ObjectShortName">inst_I[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group78" type="group">
+      <obj_property name="label">Stage E</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/Processor_bench/CPU/PC_E" type="array">
+         <obj_property name="ElementShortName">PC_E[31:0]</obj_property>
+         <obj_property name="ObjectShortName">PC_E[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/inst_E" type="array">
+         <obj_property name="ElementShortName">inst_E[31:0]</obj_property>
+         <obj_property name="ObjectShortName">inst_E[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="group83" type="group">
+         <obj_property name="label">CTRL</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_alu_op" type="array">
+            <obj_property name="ElementShortName">ctrl_alu_op[1:0]</obj_property>
+            <obj_property name="ObjectShortName">ctrl_alu_op[1:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_alu_src_a_sel" type="logic">
+            <obj_property name="ElementShortName">ctrl_alu_src_a_sel</obj_property>
+            <obj_property name="ObjectShortName">ctrl_alu_src_a_sel</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_alu_src_b_sel" type="logic">
+            <obj_property name="ElementShortName">ctrl_alu_src_b_sel</obj_property>
+            <obj_property name="ObjectShortName">ctrl_alu_src_b_sel</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_branch" type="logic">
+            <obj_property name="ElementShortName">ctrl_branch</obj_property>
+            <obj_property name="ObjectShortName">ctrl_branch</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_jump" type="logic">
+            <obj_property name="ElementShortName">ctrl_jump</obj_property>
+            <obj_property name="ObjectShortName">ctrl_jump</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_sys" type="logic">
+            <obj_property name="ElementShortName">ctrl_sys</obj_property>
+            <obj_property name="ObjectShortName">ctrl_sys</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_pc_next_sel" type="array">
+            <obj_property name="ElementShortName">ctrl_pc_next_sel[1:0]</obj_property>
+            <obj_property name="ObjectShortName">ctrl_pc_next_sel[1:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_mem_r_E" type="logic">
+            <obj_property name="ElementShortName">ctrl_mem_r_E</obj_property>
+            <obj_property name="ObjectShortName">ctrl_mem_r_E</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_mem_w_E" type="logic">
+            <obj_property name="ElementShortName">ctrl_mem_w_E</obj_property>
+            <obj_property name="ObjectShortName">ctrl_mem_w_E</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_rd_w_en_E" type="logic">
+            <obj_property name="ElementShortName">ctrl_rd_w_en_E</obj_property>
+            <obj_property name="ObjectShortName">ctrl_rd_w_en_E</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/ctrl_rd_data_sel_E" type="array">
+            <obj_property name="ElementShortName">ctrl_rd_data_sel_E[1:0]</obj_property>
+            <obj_property name="ObjectShortName">ctrl_rd_data_sel_E[1:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group84" type="group">
+         <obj_property name="label">Decoder</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/Processor_bench/CPU/opcode" type="array">
+            <obj_property name="ElementShortName">opcode[6:0]</obj_property>
+            <obj_property name="ObjectShortName">opcode[6:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/rs1" type="array">
+            <obj_property name="ElementShortName">rs1[4:0]</obj_property>
+            <obj_property name="ObjectShortName">rs1[4:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/rs2" type="array">
+            <obj_property name="ElementShortName">rs2[4:0]</obj_property>
+            <obj_property name="ObjectShortName">rs2[4:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/rd_E" type="array">
+            <obj_property name="ElementShortName">rd_E[4:0]</obj_property>
+            <obj_property name="ObjectShortName">rd_E[4:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/func3" type="array">
+            <obj_property name="ElementShortName">func3[2:0]</obj_property>
+            <obj_property name="ObjectShortName">func3[2:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/func7" type="array">
+            <obj_property name="ElementShortName">func7[6:0]</obj_property>
+            <obj_property name="ObjectShortName">func7[6:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group82" type="group">
+         <obj_property name="label">ALU</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject fp_name="/Processor_bench/CPU/alu_result_E" type="array">
+            <obj_property name="ElementShortName">alu_result_E[31:0]</obj_property>
+            <obj_property name="ObjectShortName">alu_result_E[31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/alu_op" type="array">
+            <obj_property name="ElementShortName">alu_op[3:0]</obj_property>
+            <obj_property name="ObjectShortName">alu_op[3:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/alu_src_b" type="array">
+            <obj_property name="ElementShortName">alu_src_b[31:0]</obj_property>
+            <obj_property name="ObjectShortName">alu_src_b[31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/Processor_bench/CPU/alu_src_a" type="array">
+            <obj_property name="ElementShortName">alu_src_a[31:0]</obj_property>
+            <obj_property name="ObjectShortName">alu_src_a[31:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/PC4_E" type="array">
+         <obj_property name="ElementShortName">PC4_E[31:0]</obj_property>
+         <obj_property name="ObjectShortName">PC4_E[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/imm_E" type="array">
+         <obj_property name="ElementShortName">imm_E[31:0]</obj_property>
+         <obj_property name="ObjectShortName">imm_E[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/rs2_data_E" type="array">
+         <obj_property name="ElementShortName">rs2_data_E[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rs2_data_E[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/registers" type="array">
+         <obj_property name="ElementShortName">registers[0:31][31:0]</obj_property>
+         <obj_property name="ObjectShortName">registers[0:31][31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/rs1_data" type="array">
+         <obj_property name="ElementShortName">rs1_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rs1_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/rd_data" type="array">
+         <obj_property name="ElementShortName">rd_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rd_data[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/PC_branch" type="array">
+         <obj_property name="ElementShortName">PC_branch[31:0]</obj_property>
+         <obj_property name="ObjectShortName">PC_branch[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/pc_branch_sel" type="logic">
+         <obj_property name="ElementShortName">pc_branch_sel</obj_property>
+         <obj_property name="ObjectShortName">pc_branch_sel</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group79" type="group">
+      <obj_property name="label">Stage D</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/Processor_bench/CPU/ctrl_rd_w_en_D" type="logic">
+         <obj_property name="ElementShortName">ctrl_rd_w_en_D</obj_property>
+         <obj_property name="ObjectShortName">ctrl_rd_w_en_D</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/rd_D" type="array">
+         <obj_property name="ElementShortName">rd_D[4:0]</obj_property>
+         <obj_property name="ObjectShortName">rd_D[4:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/ctrl_mem_w_D" type="logic">
+         <obj_property name="ElementShortName">ctrl_mem_w_D</obj_property>
+         <obj_property name="ObjectShortName">ctrl_mem_w_D</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/ctrl_mem_r_D" type="logic">
+         <obj_property name="ElementShortName">ctrl_mem_r_D</obj_property>
+         <obj_property name="ObjectShortName">ctrl_mem_r_D</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/alu_result_D" type="array">
+         <obj_property name="ElementShortName">alu_result_D[31:0]</obj_property>
+         <obj_property name="ObjectShortName">alu_result_D[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/imm_D" type="array">
+         <obj_property name="ElementShortName">imm_D[31:0]</obj_property>
+         <obj_property name="ObjectShortName">imm_D[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/rs2_data_D" type="array">
+         <obj_property name="ElementShortName">rs2_data_D[31:0]</obj_property>
+         <obj_property name="ObjectShortName">rs2_data_D[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/ctrl_rd_data_sel_D" type="array">
+         <obj_property name="ElementShortName">ctrl_rd_data_sel_D[1:0]</obj_property>
+         <obj_property name="ObjectShortName">ctrl_rd_data_sel_D[1:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/PC4_D" type="array">
+         <obj_property name="ElementShortName">PC4_D[31:0]</obj_property>
+         <obj_property name="ObjectShortName">PC4_D[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/mem_data" type="array">
+         <obj_property name="ElementShortName">mem_data[31:0]</obj_property>
+         <obj_property name="ObjectShortName">mem_data[31:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group81" type="group">
+      <obj_property name="label">Flags</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/Processor_bench/CPU/flg_error_branch" type="logic">
+         <obj_property name="ElementShortName">flg_error_branch</obj_property>
+         <obj_property name="ObjectShortName">flg_error_branch</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/flg_error_alu" type="logic">
+         <obj_property name="ElementShortName">flg_error_alu</obj_property>
+         <obj_property name="ObjectShortName">flg_error_alu</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/flg_error_ctrl" type="logic">
+         <obj_property name="ElementShortName">flg_error_ctrl</obj_property>
+         <obj_property name="ObjectShortName">flg_error_ctrl</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/flg_error_imm" type="logic">
+         <obj_property name="ElementShortName">flg_error_imm</obj_property>
+         <obj_property name="ObjectShortName">flg_error_imm</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/flg_alu_zero" type="logic">
+         <obj_property name="ElementShortName">flg_alu_zero</obj_property>
+         <obj_property name="ObjectShortName">flg_alu_zero</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Processor_bench/CPU/flg_error" type="logic">
+         <obj_property name="ElementShortName">flg_error</obj_property>
+         <obj_property name="ObjectShortName">flg_error</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>
