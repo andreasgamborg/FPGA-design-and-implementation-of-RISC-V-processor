@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="UART_bench_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="UART_bench" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="26570973814546fs"></ZoomStartTime>
+      <ZoomEndTime time="26571128548100fs"></ZoomEndTime>
+      <Cursor1Time time="26571250000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="219"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="21" />
+   <wvobject fp_name="/UART_bench/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/reset" type="logic">
+      <obj_property name="ElementShortName">reset</obj_property>
+      <obj_property name="ObjectShortName">reset</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/RsRx" type="logic">
+      <obj_property name="ElementShortName">RsRx</obj_property>
+      <obj_property name="ObjectShortName">RsRx</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/RsTx" type="logic">
+      <obj_property name="ElementShortName">RsTx</obj_property>
+      <obj_property name="ObjectShortName">RsTx</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/payload_in" type="array">
+      <obj_property name="ElementShortName">payload_in[31:0]</obj_property>
+      <obj_property name="ObjectShortName">payload_in[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/payload_out" type="array">
+      <obj_property name="ElementShortName">payload_out[31:0]</obj_property>
+      <obj_property name="ObjectShortName">payload_out[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/sRx" type="logic">
+      <obj_property name="ElementShortName">sRx</obj_property>
+      <obj_property name="ObjectShortName">sRx</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/Rx" type="logic">
+      <obj_property name="ElementShortName">Rx</obj_property>
+      <obj_property name="ObjectShortName">Rx</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/enable_tick_cnt" type="array">
+      <obj_property name="ElementShortName">enable_tick_cnt[31:0]</obj_property>
+      <obj_property name="ObjectShortName">enable_tick_cnt[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/enable_tick_cnt_next" type="array">
+      <obj_property name="ElementShortName">enable_tick_cnt_next[31:0]</obj_property>
+      <obj_property name="ObjectShortName">enable_tick_cnt_next[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/enable_tick" type="logic">
+      <obj_property name="ElementShortName">enable_tick</obj_property>
+      <obj_property name="ObjectShortName">enable_tick</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/bit_cnt" type="array">
+      <obj_property name="ElementShortName">bit_cnt[3:0]</obj_property>
+      <obj_property name="ObjectShortName">bit_cnt[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/bit_cnt_next" type="array">
+      <obj_property name="ElementShortName">bit_cnt_next[3:0]</obj_property>
+      <obj_property name="ObjectShortName">bit_cnt_next[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/Rx_packet" type="array">
+      <obj_property name="ElementShortName">Rx_packet[9:0]</obj_property>
+      <obj_property name="ObjectShortName">Rx_packet[9:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/Rx_idle" type="logic">
+      <obj_property name="ElementShortName">Rx_idle</obj_property>
+      <obj_property name="ObjectShortName">Rx_idle</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/Rx_packet_done" type="logic">
+      <obj_property name="ElementShortName">Rx_packet_done</obj_property>
+      <obj_property name="ObjectShortName">Rx_packet_done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/Rx_packet_valid" type="logic">
+      <obj_property name="ElementShortName">Rx_packet_valid</obj_property>
+      <obj_property name="ObjectShortName">Rx_packet_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/clk_freq" type="other">
+      <obj_property name="ElementShortName">clk_freq</obj_property>
+      <obj_property name="ObjectShortName">clk_freq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/baud" type="other">
+      <obj_property name="ElementShortName">baud</obj_property>
+      <obj_property name="ObjectShortName">baud</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/packet_length" type="other">
+      <obj_property name="ElementShortName">packet_length</obj_property>
+      <obj_property name="ObjectShortName">packet_length</obj_property>
+   </wvobject>
+   <wvobject fp_name="/UART_bench/UART/CNT_MAX" type="other">
+      <obj_property name="ElementShortName">CNT_MAX</obj_property>
+      <obj_property name="ObjectShortName">CNT_MAX</obj_property>
+   </wvobject>
+</wave_config>

@@ -2,6 +2,12 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+--Payload out
+--31      23    15    7
+--|status|valid|blank|package|
+
+--Payload in
+--|status|valid|blank|package|
 
 entity UART_driver is
     generic(
@@ -31,13 +37,13 @@ architecture Behavioral of UART_driver is
     signal bit_cnt, bit_cnt_next : unsigned(3 downto 0);
 
     signal Rx_packet : std_logic_vector(9 downto 0);
-    signal Rx_packet_done : std_logic;  
-    signal Rx_idle: std_logic;  
+    signal Rx_idle, Rx_packet_done, Rx_packet_valid : std_logic;  
     
 begin
     enable_tick <= '1' when (enable_tick_cnt = CNT_MAX) else '0';
     Rx_idle <= '1' when (Rx_packet = "1111111111") else '0';
     Rx_packet_done <= '1' when  ((bit_cnt = packet_length-1) and (Rx_idle = '0')) else '0';
+    Rx_packet_valid <= Rx_packet_done and not payload_in(24);
     
     process(all) -- Set Next
     begin
@@ -59,6 +65,7 @@ begin
         if reset = '1' then
             enable_tick_cnt <= (others => '0');
             bit_cnt <= (others => '0');
+            Rx_packet <= (others => '1');
         elsif rising_edge(clk) then
             sRx <= RsRx;
             Rx <= sRx;
@@ -70,6 +77,6 @@ begin
         end if;
     end process;
 
-    payload_out <= (31 downto 17 => '0')& Rx_packet_done & (15 downto 8 => '0') & Rx_packet(8 downto 1);
+    payload_out <= (31 downto 17 => '0')& Rx_packet_valid & (15 downto 8 => '0') & Rx_packet(8 downto 1);
     RsTx <= Rx;
 end Behavioral;
