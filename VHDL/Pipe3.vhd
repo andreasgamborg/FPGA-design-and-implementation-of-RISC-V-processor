@@ -81,7 +81,14 @@ architecture Behavioral of Processor is
   begin
     flg_error <= flg_error_alu or flg_error_ctrl or flg_error_imm or flg_error_branch;
     PC4_I <= std_logic_vector(unsigned(PC_I) + 4);
-    flg_stall <= not Imem_ready_in;
+    
+    process(all)     -- Hazard detection
+    begin
+        flg_stall <= '0';
+        if Imem_ready_in = '0' then
+            flg_stall <= '1';
+        end if;
+    end process;
     
     process(all)     -- Instruction fetch or STALL
     begin
@@ -97,7 +104,7 @@ architecture Behavioral of Processor is
     end process;
     
     
-    process(clk, reset)     -- PC and registerfile
+    process(all)     -- PC and registerfile
     begin
         if reset = '1' then
             PC_I <= pc_base;
@@ -109,9 +116,21 @@ architecture Behavioral of Processor is
             end if;
         end if;
         registers(0) <= (others => '0');
+        -- Read
+        -- Register file forwards data if the same register is written to and read from
+        if rd_D = rs1 then
+            rs1_data <= rd_data;
+        else
+            rs1_data <= registers(to_integer(unsigned(rs1)));
+        end if;
+        if rd_D = rs2 then
+            rs2_data_E <= rd_data;
+        else
+            rs2_data_E <= registers(to_integer(unsigned(rs2)));
+        end if;
     end process;
     
-    process(clk, reset)     -- Pipe registers
+    process(all)     -- Pipe registers
     begin
         if reset = '1' then
         --Control
@@ -286,12 +305,8 @@ architecture Behavioral of Processor is
         end if;
     end process;
     
-    process(all)    -- Read data from register file and memory
+    process(all)    -- Memory
     begin
-        -- Registers
-        rs1_data <= registers(to_integer(unsigned(rs1)));
-        rs2_data_E <= registers(to_integer(unsigned(rs2)));
-        -- Memory
         mem_data <= Dmem_data_in;
         Dmem_data_out <= rs2_data_D;
         Dmem_addr_out <= alu_result_D;

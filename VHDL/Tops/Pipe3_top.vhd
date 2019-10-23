@@ -7,7 +7,7 @@ use work.static.all;
 
 entity Pipe3_top is
     Port (  
-        clk : IN STD_LOGIC;
+        basys3_clk : IN STD_LOGIC;
         basys3_switch : IN STD_LOGIC_VECTOR(15 downto 0);
         basys3_btn : IN STD_LOGIC_VECTOR(4 downto 0);
         basys3_pbtn : IN STD_LOGIC_VECTOR(3 downto 0);
@@ -27,13 +27,26 @@ entity Pipe3_top is
 end Pipe3_top;
 
 architecture Behavioral of Pipe3_top is
-    signal reset : STD_LOGIC;
+    signal reset, clk : STD_LOGIC;
+    
+    component Clock_gen is
+      port (
+        clk20 :     out STD_LOGIC;
+        clk10 :     out STD_LOGIC;
+        clk5 :      out STD_LOGIC;
+        clk_pixel : out STD_LOGIC;
+        clksys :    in STD_LOGIC
+      );
+    end component;
+    
     component Processor is
         Port(  
             clk : IN STD_LOGIC;
             reset : IN STD_LOGIC;
             --Imem interface
             Imem_addr_out: OUT STD_LOGIC_VECTOR(31 downto 0);
+            Imem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
+            Imem_r_w_out: OUT STD_LOGIC;
             Imem_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
             Imem_valid_out: OUT STD_LOGIC;
             Imem_ready_in: IN STD_LOGIC;
@@ -49,17 +62,19 @@ architecture Behavioral of Pipe3_top is
         );
     end component;
     
-        signal Dmem_addr:  STD_LOGIC_VECTOR(31 downto 0);
-        signal Dmem_data_in:  STD_LOGIC_VECTOR(31 downto 0);
-        signal Dmem_r_w:  STD_LOGIC;                       --0:read 1:write
-        signal Dmem_data_out:  STD_LOGIC_VECTOR(31 downto 0);
-        signal Dmem_valid:  STD_LOGIC;
-        signal Dmem_ready:  STD_LOGIC;
+        signal Dmem_addr:       STD_LOGIC_VECTOR(31 downto 0);
+        signal Dmem_data_in:    STD_LOGIC_VECTOR(31 downto 0);
+        signal Dmem_r_w:        STD_LOGIC;                       --0:read 1:write
+        signal Dmem_data_out:   STD_LOGIC_VECTOR(31 downto 0);
+        signal Dmem_valid:      STD_LOGIC;
+        signal Dmem_ready:      STD_LOGIC;
             
-        signal Imem_addr:   STD_LOGIC_VECTOR(31 downto 0);
-        signal Imem_data:    STD_LOGIC_VECTOR(31 downto 0);
-        signal Imem_valid:  STD_LOGIC;
-        signal Imem_ready:   STD_LOGIC;
+        signal Imem_addr:       STD_LOGIC_VECTOR(31 downto 0);
+        signal Imem_data_in:    STD_LOGIC_VECTOR(31 downto 0);
+        signal Imem_r_w:        STD_LOGIC;
+        signal Imem_data_out:   STD_LOGIC_VECTOR(31 downto 0);
+        signal Imem_valid:      STD_LOGIC;
+        signal Imem_ready:      STD_LOGIC;
     
     component Memory_driver is
         Port(
@@ -71,9 +86,11 @@ architecture Behavioral of Pipe3_top is
             Dmem_valid_in: IN STD_LOGIC;
             Dmem_ready_out: OUT STD_LOGIC;
             --Imem
-            Imem_addr_in: IN STD_LOGIC_VECTOR(31 downto 0);
-            Imem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-            Imem_valid_in: IN STD_LOGIC;
+            Imem_addr_in:   IN STD_LOGIC_VECTOR(31 downto 0);
+            Imem_data_in:   IN STD_LOGIC_VECTOR(31 downto 0);
+            Imem_r_w_in:    IN STD_LOGIC;
+            Imem_data_out:  OUT STD_LOGIC_VECTOR(31 downto 0);
+            Imem_valid_in:  IN STD_LOGIC;
             Imem_ready_out: OUT STD_LOGIC;
             -- MMIO
             mem_addr_in: OUT STD_LOGIC_VECTOR(31 downto 0);
@@ -123,7 +140,7 @@ architecture Behavioral of Pipe3_top is
           
     component UART_driver is
         generic(
-            clk_freq :      integer := 100e6; -- Hz
+            clk_freq :      integer := 5e6; -- Hz
             baud :          integer := 9600; -- bits per sec
             packet_length : integer := 10   -- bits
         );
@@ -139,17 +156,19 @@ architecture Behavioral of Pipe3_top is
     
     
     component VGA_driver is
-    Port ( 
-        clk : in STD_LOGIC;
-        reset : in STD_LOGIC;
-        VGA_IN :         IN interface_VGA;
-        VGA_HS_OUT : out STD_LOGIC;
-        VGA_VS_OUT : out STD_LOGIC;
-        VGA_RED_OUT : out STD_LOGIC_VECTOR (3 downto 0);
-        VGA_BLUE_OUT : out STD_LOGIC_VECTOR (3 downto 0);
-        VGA_GREEN_OUT : out STD_LOGIC_VECTOR (3 downto 0)
-    );
+        Port ( 
+            clk_pixel : in STD_LOGIC;
+            reset : in STD_LOGIC;
+            VGA_IN :         IN interface_VGA;
+            VGA_HS_OUT : out STD_LOGIC;
+            VGA_VS_OUT : out STD_LOGIC;
+            VGA_RED_OUT : out STD_LOGIC_VECTOR (3 downto 0);
+            VGA_BLUE_OUT : out STD_LOGIC_VECTOR (3 downto 0);
+            VGA_GREEN_OUT : out STD_LOGIC_VECTOR (3 downto 0)
+        );
     end component;
+    signal clk_pixel : STD_LOGIC;
+
     
     component Keyboard_driver is
     Port (  
@@ -187,7 +206,12 @@ architecture Behavioral of Pipe3_top is
           
 begin
     reset <= basys3_btn(0);
-    
+    Clock : clock_gen 
+    port map(
+        clksys => basys3_clk,
+        clk5   => clk,
+        clk_pixel => clk_pixel
+    );
     CPU : Processor 
     port map(
     --  PORT            => SIGNAL
@@ -195,7 +219,9 @@ begin
         reset           => reset, 
     --Imem        
         Imem_addr_out   => Imem_addr,
-        Imem_data_in    => Imem_data,
+        Imem_data_out   => Imem_data_in, 
+        Imem_r_w_out    => Imem_r_w,
+        Imem_data_in    => Imem_data_out,
         Imem_valid_out  => Imem_valid,
         Imem_ready_in   => Imem_ready,
     --Dmem        
@@ -217,9 +243,11 @@ begin
         Dmem_data_out   =>  Dmem_data_out, 
         Dmem_valid_in   =>  Dmem_valid, 
         Dmem_ready_out  =>  Dmem_ready,
-    --Imem                       
+    --Imem        
         Imem_addr_in    =>  Imem_addr,  
-        Imem_data_out   =>  Imem_data, 
+        Imem_data_in    =>  Imem_data_in,
+        Imem_r_w_in     =>  Imem_r_w, 
+        Imem_data_out   =>  Imem_data_out,
         Imem_valid_in   =>  Imem_valid, 
         Imem_ready_out  =>  Imem_ready,
     -- mem
@@ -265,7 +293,7 @@ begin
     VGA : VGA_driver
     port map(
     --  PORT            => SIGNAL
-        clk             => clk,           
+        clk_pixel       => clk_pixel,           
         reset           => reset, 
         VGA_IN          => vga_out,
         VGA_HS_OUT      => VGA_HS_OUT,

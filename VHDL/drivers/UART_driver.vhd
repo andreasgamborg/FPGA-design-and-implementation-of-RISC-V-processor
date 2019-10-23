@@ -37,19 +37,18 @@ architecture Behavioral of UART_driver is
     signal bit_cnt, bit_cnt_next : unsigned(3 downto 0);
 
     signal Rx_packet : std_logic_vector(9 downto 0);
-    signal Rx_idle, Rx_packet_done, Rx_packet_valid : std_logic;  
+    signal Rx_idle, Rx_packet_valid : std_logic;  
     
 begin
     enable_tick <= '1' when (enable_tick_cnt = CNT_MAX) else '0';
     Rx_idle <= '1' when (Rx_packet = "1111111111") else '0';
-    Rx_packet_done <= '1' when  ((bit_cnt = packet_length-1) and (Rx_idle = '0')) else '0';
-    Rx_packet_valid <= Rx_packet_done and not payload_in(24);
+    Rx_packet_valid <= '1' when  ((bit_cnt = packet_length-1) and (Rx_idle = '0')) else '0';
     
     process(all) -- Set Next
     begin
         if enable_tick = '1' then
             enable_tick_cnt_next <= (others => '0');
-             if (Rx_packet_done = '1' or Rx_idle = '1') then
+             if (Rx_packet_valid = '1' or Rx_idle = '1') then
                 bit_cnt_next <= (others => '0');
             else
                 bit_cnt_next <= bit_cnt+1;

@@ -15,7 +15,7 @@ architecture Behavioral of Keyboard_driver is
     
 begin
     
-    process(PS2Clk)
+    process(all)
     begin
         if reset = '1' then
             data <= (others => '0');
