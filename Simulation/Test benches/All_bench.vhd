@@ -9,15 +9,16 @@ entity All_bench is
 end All_bench;
 
 architecture Behavioral of All_bench is
-    signal clk : STD_LOGIC := '0';
+    signal basys3_clk : STD_LOGIC := '0';
     signal reset : STD_LOGIC := '1';
 
-    signal basys3_switch :  STD_LOGIC_VECTOR(15 downto 0);
-    signal basys3_btn :  STD_LOGIC_VECTOR(4 downto 0);
-    signal basys3_pbtn :  STD_LOGIC_VECTOR(3 downto 0);
+    signal basys3_switch :  STD_LOGIC_VECTOR(15 downto 0):=(others => '0');
+    signal basys3_btn :  STD_LOGIC_VECTOR(4 downto 0):=(others => '0');
+    signal basys3_pbtn :  STD_LOGIC_VECTOR(3 downto 0):=(others => '0');
     signal PS2Clk, PS2Data : STD_LOGIC;
-    signal RsRx, RsTx : STD_LOGIC;
+    signal RsRx : STD_LOGIC := '1';
     
+    signal RsTx : STD_LOGIC;
     signal basys3_led : STD_LOGIC_VECTOR(15 downto 0);
     signal basys3_seg7 : STD_LOGIC_VECTOR(7 downto 0);
     signal basys3_an :  STD_LOGIC_VECTOR(3 downto 0);
@@ -27,6 +28,16 @@ architecture Behavioral of All_bench is
     signal VGA_BLUE_OUT :  STD_LOGIC_VECTOR (3 downto 0);
     signal VGA_GREEN_OUT :  STD_LOGIC_VECTOR (3 downto 0);
    
+   component Clock_gen is
+      port (
+        clk20 : out STD_LOGIC;
+        clk10 : out STD_LOGIC;
+        clk5 : out STD_LOGIC;
+        clksys : in STD_LOGIC
+      );
+    end component;
+    signal clk : STD_LOGIC;
+
     component Processor is
         Port(  
             clk : IN STD_LOGIC;
@@ -128,7 +139,7 @@ architecture Behavioral of All_bench is
           
     component UART_driver is
         generic(
-            clk_freq :      integer := 100e6; -- Hz
+            clk_freq :      integer := 10e6; -- Hz
             baud :          integer := 9600; -- bits per sec
             packet_length : integer := 10   -- bits
         );
@@ -189,9 +200,32 @@ architecture Behavioral of All_bench is
         an_out :    OUT STD_LOGIC_VECTOR(3 downto 0)
     );
     end component;
-          
+    -- Procedures
+    procedure UART_WRITE_BYTE (
+    i_data_in       : in  std_logic_vector(7 downto 0);
+    signal o_serial : out std_logic) is
+    constant RX_period : time := 104166.6667 ns; --9600 baud
+    begin
+        -- Send Start Bit
+        o_serial <= '0';
+        wait for RX_period;
+        
+        -- Send Data Byte
+        for ii in 0 to 7 loop
+        o_serial <= i_data_in(ii);
+        wait for RX_period;
+        end loop;  -- ii
+        
+        -- Send Stop Bit
+        o_serial <= '1';
+        wait for RX_period;
+    end UART_WRITE_BYTE;
 begin
-    
+    Clock : clock_gen 
+    port map(
+        clksys => basys3_clk,
+        clk5   => clk
+    );
     CPU : Processor 
     port map(
     --  PORT            => SIGNAL
@@ -314,12 +348,21 @@ begin
         seg7_out        => basys3_seg7, 
         an_out          => basys3_an
     ); 
-    clk <= not clk after 50 ns;
+    basys3_clk <= not basys3_clk after 5 ns;
     
     process is
     begin
-        wait for 200ns;
-        reset <= '0';
+        wait for 200 ns;
+        reset <= '0';        
+        wait for 50 us;
+        UART_WRITE_BYTE(X"13", RsRx);
+        UART_WRITE_BYTE(X"23", RsRx);
+        UART_WRITE_BYTE(X"43", RsRx);
+        UART_WRITE_BYTE(X"c3", RsRx);
+        UART_WRITE_BYTE(X"aa", RsRx);
+        UART_WRITE_BYTE(X"bb", RsRx);
+        UART_WRITE_BYTE(X"cc", RsRx);
+        UART_WRITE_BYTE(X"dd", RsRx);
     end process;
     
 end Behavioral;
