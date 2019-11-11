@@ -59,14 +59,7 @@ begin
     
     process(all)
     begin
-        mem_addr_in <= (others => '0');
-        mem_data_in <= (others => '0');
-        mem_r_w_in <= '0';
-        
-        Imem_ready_out <= mem_ready_out;
         Imem_data_out <= mem_data_out;
-
-        Dmem_ready_out <= mem_ready_out;
         Dmem_data_out <= mem_data_out;
 
         if Dmem_valid_in = '1' then
@@ -75,11 +68,22 @@ begin
             mem_r_w_in <=  Dmem_r_w_in;
             mem_valid_in <= '1';
             Imem_ready_out <= '0';
+            Dmem_ready_out <= '1';
         elsif Imem_valid_in = '1' then
             mem_addr_in <= Imem_addr_in;
+            mem_data_in <= Imem_data_in;
+            mem_r_w_in <=  Imem_r_w_in;
             mem_valid_in <= '1';
+            Imem_ready_out <= '1';
+            Dmem_ready_out <= '0';
         else
             mem_valid_in <= '0';
+            mem_addr_in <= (others => '0');
+            mem_data_in <= (others => '0');
+            mem_r_w_in <= '0';
+            mem_valid_in <= '0';
+            Imem_ready_out <= '1';
+            Dmem_ready_out <= '1';
         end if;
     end process;
 

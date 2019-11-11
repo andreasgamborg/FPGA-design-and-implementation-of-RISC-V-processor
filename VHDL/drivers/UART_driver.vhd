@@ -29,7 +29,7 @@ architecture Behavioral of UART_driver is
     signal sRx, Rx: STD_LOGIC;
     --constant CNT_MAX : unsigned(13 downto 0) := d"10417";   --baud 9600 @ 100Hz
     --constant CNT_MAX : unsigned(10 downto 0) := d"1042";    --baud 9600 @ 10Hz
-    constant CNT_MAX : integer := clk_freq/baud;
+    constant CNT_MAX : integer := clk_freq/baud-1;
 
     signal enable_tick_cnt, enable_tick_cnt_next : unsigned(31 downto 0);
     signal enable_tick : std_logic;
@@ -57,6 +57,10 @@ begin
             enable_tick_cnt_next <= enable_tick_cnt+1;
             bit_cnt_next <= bit_cnt;
         end if;
+        if(Rx_packet_valid = '1' and Rx = '1') then 
+            enable_tick_cnt_next <= to_unsigned(CNT_MAX/2,32);
+        end if;
+
     end process;
     
     process(all) -- Update

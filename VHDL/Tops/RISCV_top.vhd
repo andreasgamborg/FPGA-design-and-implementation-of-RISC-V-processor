@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.ALL;
 library work;
 use work.static.all;
 
-entity Pipe3_top is
+entity RISCV_top is
     Port (  
         basys3_clk : IN STD_LOGIC;
         basys3_switch : IN STD_LOGIC_VECTOR(15 downto 0);
@@ -24,9 +24,9 @@ entity Pipe3_top is
         VGA_BLUE_OUT : OUT STD_LOGIC_VECTOR (3 downto 0);
         VGA_GREEN_OUT : OUT STD_LOGIC_VECTOR (3 downto 0)
     );
-end Pipe3_top;
+end RISCV_top;
 
-architecture Behavioral of Pipe3_top is
+architecture Behavioral of RISCV_top is
     signal reset, clk : STD_LOGIC;
     
     component Clock_gen is

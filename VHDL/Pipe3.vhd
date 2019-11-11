@@ -108,7 +108,7 @@ architecture Behavioral of Processor is
     begin
         if reset = '1' then
             PC_I <= pc_base;
-            registers(2) <= x"000003ff";
+            registers(2) <= x"00001000";
         elsif rising_edge(clk) then
             PC_I <= PC_next;
             if ctrl_rd_w_en_D = '1' then
@@ -118,12 +118,12 @@ architecture Behavioral of Processor is
         registers(0) <= (others => '0');
         -- Read
         -- Register file forwards data if the same register is written to and read from
-        if rd_D = rs1 then
+        if rd_D = rs1 and rs1 /= "00000" then
             rs1_data <= rd_data;
         else
             rs1_data <= registers(to_integer(unsigned(rs1)));
         end if;
-        if rd_D = rs2 then
+        if rd_D = rs2 and rs2 /= "00000" then
             rs2_data_E <= rd_data;
         else
             rs2_data_E <= registers(to_integer(unsigned(rs2)));

@@ -33,10 +33,11 @@ architecture Behavioral of All_bench is
         clk20 : out STD_LOGIC;
         clk10 : out STD_LOGIC;
         clk5 : out STD_LOGIC;
+        clk_pixel : out STD_LOGIC;
         clksys : in STD_LOGIC
       );
     end component;
-    signal clk : STD_LOGIC;
+    signal clk, clk_pixel : STD_LOGIC;
 
     component Processor is
         Port(  
@@ -108,7 +109,7 @@ architecture Behavioral of All_bench is
        signal mem_valid_in:     STD_LOGIC;
        signal mem_ready_out:    STD_LOGIC;
        
-    component Memory is
+    component Memory_sim is
         Port(
             clk : IN STD_LOGIC;
             reset : IN STD_LOGIC;
@@ -156,7 +157,7 @@ architecture Behavioral of All_bench is
     
     component VGA_driver is
     Port ( 
-        clk : in STD_LOGIC;
+        clk_pixel : in STD_LOGIC;
         reset : in STD_LOGIC;
         VGA_IN :         IN interface_VGA;
         VGA_HS_OUT : out STD_LOGIC;
@@ -224,7 +225,8 @@ begin
     Clock : clock_gen 
     port map(
         clksys => basys3_clk,
-        clk5   => clk
+        clk5   => clk,
+        clk_pixel => clk_pixel
     );
     CPU : Processor 
     port map(
@@ -272,7 +274,7 @@ begin
         mem_valid_in    =>  mem_valid_in,
         mem_ready_out   =>  mem_ready_out
     );
-    Mem : Memory
+    Mem : Memory_sim
     port map(
     --  PORT            => SIGNAL
         --CPU
@@ -307,7 +309,7 @@ begin
     VGA : VGA_driver
     port map(
     --  PORT            => SIGNAL
-        clk             => clk,           
+        clk_pixel       => clk_pixel,           
         reset           => reset, 
         VGA_IN          => vga_out,
         VGA_HS_OUT      => VGA_HS_OUT,
@@ -354,15 +356,16 @@ begin
     begin
         wait for 200 ns;
         reset <= '0';        
-        wait for 50 us;
-        UART_WRITE_BYTE(X"13", RsRx);
-        UART_WRITE_BYTE(X"23", RsRx);
-        UART_WRITE_BYTE(X"43", RsRx);
-        UART_WRITE_BYTE(X"c3", RsRx);
-        UART_WRITE_BYTE(X"aa", RsRx);
-        UART_WRITE_BYTE(X"bb", RsRx);
-        UART_WRITE_BYTE(X"cc", RsRx);
-        UART_WRITE_BYTE(X"dd", RsRx);
+        wait for 250 ns;
+        basys3_pbtn <= "0010";
+--        UART_WRITE_BYTE(X"13", RsRx);
+--        UART_WRITE_BYTE(X"23", RsRx);
+--        UART_WRITE_BYTE(X"43", RsRx);
+--        UART_WRITE_BYTE(X"c3", RsRx);
+--        UART_WRITE_BYTE(X"aa", RsRx);
+--        UART_WRITE_BYTE(X"bb", RsRx);
+--        UART_WRITE_BYTE(X"cc", RsRx);
+--        UART_WRITE_BYTE(X"dd", RsRx);
     end process;
     
 end Behavioral;

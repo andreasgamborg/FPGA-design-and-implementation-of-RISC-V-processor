@@ -9,25 +9,30 @@ entity Processor_bench is
 end Processor_bench;
 
 architecture Behavioral of Processor_bench is
-    
+
     component Processor is
         generic(
             XLEN : integer := 32
         );
         Port(  
-            clk :           IN STD_LOGIC;
-            reset :         IN STD_LOGIC;
-            Imem_addr_out:  OUT STD_LOGIC_VECTOR(31 downto 0);
-            Imem_data_in:   IN STD_LOGIC_VECTOR(31 downto 0);
+            clk : IN STD_LOGIC;
+            reset : IN STD_LOGIC;
+            --Imem interface
+            Imem_addr_out: OUT STD_LOGIC_VECTOR(31 downto 0);
+            Imem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
+            Imem_r_w_out: OUT STD_LOGIC;
+            Imem_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
             Imem_valid_out: OUT STD_LOGIC;
-            Imem_ready_in:  IN STD_LOGIC;
-            Dmem_addr_out:  OUT STD_LOGIC_VECTOR(31 downto 0);
-            Dmem_data_out:  OUT STD_LOGIC_VECTOR(31 downto 0);
-            Dmem_r_w_out:   OUT STD_LOGIC;
-            Dmem_data_in:   IN STD_LOGIC_VECTOR(31 downto 0);
+            Imem_ready_in: IN STD_LOGIC;
+            --Dmem interface
+            Dmem_addr_out: OUT STD_LOGIC_VECTOR(31 downto 0);
+            Dmem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
+            Dmem_r_w_out: OUT STD_LOGIC;
+            Dmem_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
             Dmem_valid_out: OUT STD_LOGIC;
-            Dmem_ready_in:  IN STD_LOGIC;
-            flg_error :     OUT STD_LOGIC
+            Dmem_ready_in: IN STD_LOGIC;
+            --flags
+            flg_error : OUT STD_LOGIC
         );
     end component;
     
@@ -36,6 +41,8 @@ architecture Behavioral of Processor_bench is
     signal   reset :          STD_LOGIC                        := '1';
     
     signal   Imem_addr_out:   STD_LOGIC_VECTOR(31 downto 0);
+    signal   Imem_data_out:   STD_LOGIC_VECTOR(31 downto 0);
+    signal   Imem_r_w_out:    STD_LOGIC;
     signal   Imem_data_in:    STD_LOGIC_VECTOR(31 downto 0);
     signal   Imem_valid_out:  STD_LOGIC;
     signal   Imem_ready_in:   STD_LOGIC;
@@ -55,6 +62,8 @@ begin
             clk             => clk,           
             reset           => reset, 
             Imem_addr_out   => Imem_addr_out,
+            Imem_data_out   => Imem_data_out,
+            Imem_r_w_out    => Imem_r_w_out,
             Imem_data_in    => Imem_data_in, 
             Imem_valid_out  => Imem_valid_out,
             Imem_ready_in   => Imem_ready_in,

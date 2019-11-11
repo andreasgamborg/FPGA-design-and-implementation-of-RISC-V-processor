@@ -20,6 +20,7 @@ package Static is
 
     --PC
     constant PC_base :          std_logic_vector(31 downto 0) := x"00000000";
+    constant PC_error :         std_logic_vector(31 downto 0) := x"00000000";
 
     --Memory
     -- Sizes are in registers of 32-bit
@@ -43,7 +44,7 @@ package Static is
     constant memory_data_size :     positive := memory_size-memory_data_addr;
 
     -- Every rgister below UART out is READ ONLY
-    constant memory_read_only :     integer := memory_UART_addr;
+    constant memory_read_only :     positive := memory_UART_addr;
 
     --Interfaces
 

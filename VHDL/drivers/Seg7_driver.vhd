@@ -72,25 +72,29 @@ begin
   
     process(all) 
     begin
-        case xseg7 is
-            when x"0" => seg7_out <= "00000011";
-            when x"1" => seg7_out <= "10011111";
-            when x"2" => seg7_out <= "00100101";
-            when x"3" => seg7_out <= "00001101";
-            when x"4" => seg7_out <= "10011001";
-            when x"5" => seg7_out <= "01001001";
-            when x"6" => seg7_out <= "01000001";
-            when x"7" => seg7_out <= "00011111";
-            when x"8" => seg7_out <= "00000001";
-            when x"9" => seg7_out <= "00011001";
-            when x"a" => seg7_out <= "00010001";
-            when x"b" => seg7_out <= "11000001";
-            when x"c" => seg7_out <= "11100101";
-            when x"d" => seg7_out <= "10000101";
-            when x"e" => seg7_out <= "01100001";
-            when x"f" => seg7_out <= "01110001";
-            when others => seg7_out <= "11111110";
-        end case;
+        if seg7_in(31) = '1' then
+            seg7_out <= "11100011";
+        else
+            case xseg7 is
+                when x"0" => seg7_out <= "00000011";
+                when x"1" => seg7_out <= "10011111";
+                when x"2" => seg7_out <= "00100101";
+                when x"3" => seg7_out <= "00001101";
+                when x"4" => seg7_out <= "10011001";
+                when x"5" => seg7_out <= "01001001";
+                when x"6" => seg7_out <= "01000001";
+                when x"7" => seg7_out <= "00011111";
+                when x"8" => seg7_out <= "00000001";
+                when x"9" => seg7_out <= "00011001";
+                when x"a" => seg7_out <= "00010001";
+                when x"b" => seg7_out <= "11000001";
+                when x"c" => seg7_out <= "11100101";
+                when x"d" => seg7_out <= "10000101";
+                when x"e" => seg7_out <= "01100001";
+                when x"f" => seg7_out <= "01110001";
+                when others => seg7_out <= "11111110";
+            end case;
+        end if;
     end process;
 end Behavioral;
 

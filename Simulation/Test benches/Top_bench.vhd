@@ -8,9 +8,10 @@ use work.static.all;
 entity Top_bench is
 end Top_bench;
 
+
 architecture Behavioral of Top_bench is
     
-    component Pipe3_top is
+    component RISCV_top is
     Port (  
         basys3_clk : IN STD_LOGIC;
         basys3_switch : IN STD_LOGIC_VECTOR(15 downto 0);
@@ -69,7 +70,7 @@ architecture Behavioral of Top_bench is
         wait for RX_period;
     end UART_WRITE_BYTE;
 begin
-    Top : Pipe3_top
+    Top : RISCV_top
     PORT MAP(
         basys3_clk => basys3_clk,
         basys3_switch => basys3_switch,
@@ -89,24 +90,33 @@ begin
         VGA_GREEN_OUT => VGA_GREEN_OUT        
     );
     basys3_clk <= not basys3_clk after 5 ns;
-    
+
     process is
     begin
         basys3_btn <= "00001";
-        basys3_pbtn <= "0000";
-        basys3_switch <= x"0000";
-
         wait for 200 ns;
         basys3_btn <= "00000";
-        wait for 50 us;
+        wait for 550 us;
+
         UART_WRITE_BYTE(X"13", RsRx);
-        UART_WRITE_BYTE(X"23", RsRx);
-        UART_WRITE_BYTE(X"43", RsRx);
-        UART_WRITE_BYTE(X"c3", RsRx);
-        UART_WRITE_BYTE(X"aa", RsRx);
-        UART_WRITE_BYTE(X"bb", RsRx);
-        UART_WRITE_BYTE(X"cc", RsRx);
-        UART_WRITE_BYTE(X"dd", RsRx);
+        UART_WRITE_BYTE(X"00", RsRx);
+        UART_WRITE_BYTE(X"00", RsRx);
+        UART_WRITE_BYTE(X"00", RsRx);
+
+        UART_WRITE_BYTE(X"93", RsRx);
+        UART_WRITE_BYTE(X"02", RsRx);
+        UART_WRITE_BYTE(X"00", RsRx);
+        UART_WRITE_BYTE(X"41", RsRx);
+        
+        UART_WRITE_BYTE(X"37", RsRx);
+        UART_WRITE_BYTE(X"03", RsRx);
+        UART_WRITE_BYTE(X"ff", RsRx);
+        UART_WRITE_BYTE(X"0f", RsRx);
+        
+        wait for 500us;
+        basys3_pbtn <= "1111";
+        wait for 100us;
+
     end process;
     
 end Behavioral;

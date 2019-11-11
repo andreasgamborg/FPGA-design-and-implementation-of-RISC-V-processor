@@ -29,8 +29,8 @@ end UART_bench;
 architecture Behavioral of UART_bench is
     component UART_driver is
         generic(
-            clk_freq :      integer := 10e6; -- Hz
-            baud :          integer := 57600; -- bits per sec
+            clk_freq :      integer := 20e6; -- Hz
+            baud :          integer := 9600; -- bits per sec
             packet_length : integer := 10   -- bits
         );
         Port (  
@@ -49,7 +49,8 @@ architecture Behavioral of UART_bench is
         signal payload_in : std_logic_vector(31 downto 0);
         signal payload_out : std_logic_vector(31 downto 0);
         
-        constant RX_period : time := 17361 ns;
+    constant RX_period : time := 104166.6667 ns; --9600 baud
+
     
     procedure UART_WRITE_BYTE (
     i_data_in       : in  std_logic_vector(7 downto 0);
@@ -83,22 +84,22 @@ begin
             payload_out     => payload_out
         ); 
         
-    clk <= not clk after 50 ns;
+    clk <= not clk after 25 ns;
     payload_in <= x"00000000";
     
     process is
     begin
-        wait for 255ns;
+        wait for 1us;
         reset <= '0';
-        wait for RX_period*9;
+        wait for 50us;
+
+    for ii in 0 to 400 loop
         UART_WRITE_BYTE(X"13", RsRx);
-        wait for RX_period*9;
         UART_WRITE_BYTE(X"23", RsRx);
-        wait for RX_period*9;
         UART_WRITE_BYTE(X"43", RsRx);
-        wait for RX_period*9;
         UART_WRITE_BYTE(X"c3", RsRx);
-        UART_WRITE_BYTE(X"aa", RsRx);
+    end loop;  -- ii 
+    
     end process;
     
 end Behavioral;
