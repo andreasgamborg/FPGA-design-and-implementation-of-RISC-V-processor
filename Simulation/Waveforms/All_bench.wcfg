@@ -12,13 +12,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="6426286078fs"></ZoomStartTime>
-      <ZoomEndTime time="6747710661fs"></ZoomEndTime>
-      <Cursor1Time time="7000000000fs"></Cursor1Time>
+      <ZoomStartTime time="2830666667fs"></ZoomStartTime>
+      <ZoomEndTime time="5976666668fs"></ZoomEndTime>
+      <Cursor1Time time="3355000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="219"></NameColumnWidth>
-      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+      <ValueColumnWidth column_width="84"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="8" />
    <wvobject fp_name="/All_bench/clk" type="logic">
@@ -148,6 +148,7 @@
       <wvobject fp_name="group1470" type="group">
          <obj_property name="label">Stage E</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="/All_bench/CPU/PC_E" type="array">
             <obj_property name="ElementShortName">PC_E[31:0]</obj_property>
             <obj_property name="ObjectShortName">PC_E[31:0]</obj_property>
@@ -228,10 +229,15 @@
             <obj_property name="ElementShortName">mem_data[31:0]</obj_property>
             <obj_property name="ObjectShortName">mem_data[31:0]</obj_property>
          </wvobject>
+         <wvobject fp_name="/All_bench/CPU/alu_result_D" type="array">
+            <obj_property name="ElementShortName">alu_result_D[31:0]</obj_property>
+            <obj_property name="ObjectShortName">alu_result_D[31:0]</obj_property>
+         </wvobject>
       </wvobject>
       <wvobject fp_name="group1472" type="group">
          <obj_property name="label">CTRL</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="/All_bench/CPU/ctrl_alu_op" type="array">
             <obj_property name="ElementShortName">ctrl_alu_op[1:0]</obj_property>
             <obj_property name="ObjectShortName">ctrl_alu_op[1:0]</obj_property>
@@ -296,6 +302,135 @@
       <wvobject fp_name="/All_bench/CPU/registers" type="array">
          <obj_property name="ElementShortName">registers[0:31][31:0]</obj_property>
          <obj_property name="ObjectShortName">registers[0:31][31:0]</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/All_bench/CPU/registers[0]" type="array">
+            <obj_property name="ElementShortName">[0][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[0][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[1]" type="array">
+            <obj_property name="ElementShortName">[1][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[2]" type="array">
+            <obj_property name="ElementShortName">[2][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[2][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[3]" type="array">
+            <obj_property name="ElementShortName">[3][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[3][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[4]" type="array">
+            <obj_property name="ElementShortName">[4][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[4][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[5]" type="array">
+            <obj_property name="ElementShortName">[5][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[5][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[6]" type="array">
+            <obj_property name="ElementShortName">[6][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[6][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[7]" type="array">
+            <obj_property name="ElementShortName">[7][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[7][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[8]" type="array">
+            <obj_property name="ElementShortName">[8][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[8][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[9]" type="array">
+            <obj_property name="ElementShortName">[9][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[9][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[10]" type="array">
+            <obj_property name="ElementShortName">[10][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[10][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[11]" type="array">
+            <obj_property name="ElementShortName">[11][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[11][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[12]" type="array">
+            <obj_property name="ElementShortName">[12][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[12][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[13]" type="array">
+            <obj_property name="ElementShortName">[13][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[13][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[14]" type="array">
+            <obj_property name="ElementShortName">[14][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[14][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[15]" type="array">
+            <obj_property name="ElementShortName">[15][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[15][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[16]" type="array">
+            <obj_property name="ElementShortName">[16][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[16][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[17]" type="array">
+            <obj_property name="ElementShortName">[17][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[17][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[18]" type="array">
+            <obj_property name="ElementShortName">[18][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[18][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[19]" type="array">
+            <obj_property name="ElementShortName">[19][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[19][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[20]" type="array">
+            <obj_property name="ElementShortName">[20][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[20][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[21]" type="array">
+            <obj_property name="ElementShortName">[21][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[21][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[22]" type="array">
+            <obj_property name="ElementShortName">[22][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[22][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[23]" type="array">
+            <obj_property name="ElementShortName">[23][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[23][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[24]" type="array">
+            <obj_property name="ElementShortName">[24][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[24][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[25]" type="array">
+            <obj_property name="ElementShortName">[25][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[25][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[26]" type="array">
+            <obj_property name="ElementShortName">[26][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[26][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[27]" type="array">
+            <obj_property name="ElementShortName">[27][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[27][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[28]" type="array">
+            <obj_property name="ElementShortName">[28][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[28][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[29]" type="array">
+            <obj_property name="ElementShortName">[29][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[29][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[30]" type="array">
+            <obj_property name="ElementShortName">[30][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[30][31:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/All_bench/CPU/registers[31]" type="array">
+            <obj_property name="ElementShortName">[31][31:0]</obj_property>
+            <obj_property name="ObjectShortName">[31][31:0]</obj_property>
+         </wvobject>
       </wvobject>
       <wvobject fp_name="group1467" type="group">
          <obj_property name="label">ALU</obj_property>
@@ -307,10 +442,6 @@
          <wvobject fp_name="/All_bench/CPU/alu_result_E" type="array">
             <obj_property name="ElementShortName">alu_result_E[31:0]</obj_property>
             <obj_property name="ObjectShortName">alu_result_E[31:0]</obj_property>
-         </wvobject>
-         <wvobject fp_name="/All_bench/CPU/alu_result_D" type="array">
-            <obj_property name="ElementShortName">alu_result_D[31:0]</obj_property>
-            <obj_property name="ObjectShortName">alu_result_D[31:0]</obj_property>
          </wvobject>
          <wvobject fp_name="/All_bench/CPU/alu_src_a" type="array">
             <obj_property name="ElementShortName">alu_src_a[31:0]</obj_property>
@@ -324,6 +455,7 @@
       <wvobject fp_name="group1466" type="group">
          <obj_property name="label">Flags</obj_property>
          <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
          <wvobject fp_name="/All_bench/CPU/flg_error_branch" type="logic">
             <obj_property name="ElementShortName">flg_error_branch</obj_property>
             <obj_property name="ObjectShortName">flg_error_branch</obj_property>
@@ -518,8 +650,89 @@
          <obj_property name="ObjectShortName">Imem[0:255][31:0]</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject fp_name="/All_bench/CPU/flg_stall" type="logic">
-      <obj_property name="ElementShortName">flg_stall</obj_property>
-      <obj_property name="ObjectShortName">flg_stall</obj_property>
+   <wvobject fp_name="group241" type="group">
+      <obj_property name="label">UART</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/All_bench/UART/clk" type="logic">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/reset" type="logic">
+         <obj_property name="ElementShortName">reset</obj_property>
+         <obj_property name="ObjectShortName">reset</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/RsRx" type="logic">
+         <obj_property name="ElementShortName">RsRx</obj_property>
+         <obj_property name="ObjectShortName">RsRx</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/RsTx" type="logic">
+         <obj_property name="ElementShortName">RsTx</obj_property>
+         <obj_property name="ObjectShortName">RsTx</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/payload_in" type="array">
+         <obj_property name="ElementShortName">payload_in[31:0]</obj_property>
+         <obj_property name="ObjectShortName">payload_in[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/payload_out" type="array">
+         <obj_property name="ElementShortName">payload_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">payload_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/sRx" type="logic">
+         <obj_property name="ElementShortName">sRx</obj_property>
+         <obj_property name="ObjectShortName">sRx</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/Rx" type="logic">
+         <obj_property name="ElementShortName">Rx</obj_property>
+         <obj_property name="ObjectShortName">Rx</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/enable_tick_cnt" type="array">
+         <obj_property name="ElementShortName">enable_tick_cnt[31:0]</obj_property>
+         <obj_property name="ObjectShortName">enable_tick_cnt[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/enable_tick_cnt_next" type="array">
+         <obj_property name="ElementShortName">enable_tick_cnt_next[31:0]</obj_property>
+         <obj_property name="ObjectShortName">enable_tick_cnt_next[31:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/enable_tick" type="logic">
+         <obj_property name="ElementShortName">enable_tick</obj_property>
+         <obj_property name="ObjectShortName">enable_tick</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/bit_cnt" type="array">
+         <obj_property name="ElementShortName">bit_cnt[3:0]</obj_property>
+         <obj_property name="ObjectShortName">bit_cnt[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/bit_cnt_next" type="array">
+         <obj_property name="ElementShortName">bit_cnt_next[3:0]</obj_property>
+         <obj_property name="ObjectShortName">bit_cnt_next[3:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/Rx_packet" type="array">
+         <obj_property name="ElementShortName">Rx_packet[9:0]</obj_property>
+         <obj_property name="ObjectShortName">Rx_packet[9:0]</obj_property>
+         <obj_property name="Radix">BINARYRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/Rx_idle" type="logic">
+         <obj_property name="ElementShortName">Rx_idle</obj_property>
+         <obj_property name="ObjectShortName">Rx_idle</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/Rx_packet_valid" type="logic">
+         <obj_property name="ElementShortName">Rx_packet_valid</obj_property>
+         <obj_property name="ObjectShortName">Rx_packet_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/clk_freq" type="other">
+         <obj_property name="ElementShortName">clk_freq</obj_property>
+         <obj_property name="ObjectShortName">clk_freq</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/baud" type="other">
+         <obj_property name="ElementShortName">baud</obj_property>
+         <obj_property name="ObjectShortName">baud</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/packet_length" type="other">
+         <obj_property name="ElementShortName">packet_length</obj_property>
+         <obj_property name="ObjectShortName">packet_length</obj_property>
+      </wvobject>
+      <wvobject fp_name="/All_bench/UART/CNT_MAX" type="other">
+         <obj_property name="ElementShortName">CNT_MAX</obj_property>
+         <obj_property name="ObjectShortName">CNT_MAX</obj_property>
+      </wvobject>
    </wvobject>
 </wave_config>
