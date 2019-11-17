@@ -30,103 +30,60 @@ architecture Behavioral of RISCV_top is
     signal reset, clk : STD_LOGIC;
     
     component Clock_gen is
-      port (
-        clk20 :     out STD_LOGIC;
-        clk10 :     out STD_LOGIC;
-        clk5 :      out STD_LOGIC;
-        clk_pixel : out STD_LOGIC;
-        clksys :    in STD_LOGIC
-      );
+        port (
+            clk20 :     out STD_LOGIC;
+            clk10 :     out STD_LOGIC;
+            clk5 :      out STD_LOGIC;
+            clk_pixel : out STD_LOGIC;
+            clksys :    in STD_LOGIC
+        );
     end component;
     
     component Processor is
         Port(  
-            clk : IN STD_LOGIC;
-            reset : IN STD_LOGIC;
+            clk :           IN STD_LOGIC;
+            reset :         IN STD_LOGIC;
             --Imem interface
-            Imem_addr_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-            Imem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-            Imem_r_w_out: OUT STD_LOGIC;
-            Imem_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
-            Imem_valid_out: OUT STD_LOGIC;
-            Imem_ready_in: IN STD_LOGIC;
+            Imem_addr_in:   OUT STD_LOGIC_VECTOR(31 downto 0);
+            Imem_data_out:  IN STD_LOGIC_VECTOR(31 downto 0);
             --Dmem interface
-            Dmem_addr_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-            Dmem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-            Dmem_r_w_out: OUT STD_LOGIC;
-            Dmem_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
-            Dmem_valid_out: OUT STD_LOGIC;
-            Dmem_ready_in: IN STD_LOGIC;
-            --flags
-            flg_error : OUT STD_LOGIC
+            Dmem_addr_in:   OUT STD_LOGIC_VECTOR(31 downto 0);
+            Dmem_data_in:   OUT STD_LOGIC_VECTOR(31 downto 0);
+            Dmem_r_w_in:    OUT STD_LOGIC;
+            Dmem_whb_in:    OUT STD_LOGIC_VECTOR(1 downto 0);
+            Dmem_data_out:  IN STD_LOGIC_VECTOR(31 downto 0)
         );
     end component;
-    
-        signal Dmem_addr:       STD_LOGIC_VECTOR(31 downto 0);
+        
+        signal Imem_addr_in:    STD_LOGIC_VECTOR(31 downto 0);
+        signal Imem_data_out:   STD_LOGIC_VECTOR(31 downto 0);  
+        
+        signal Dmem_addr_in:    STD_LOGIC_VECTOR(31 downto 0);
         signal Dmem_data_in:    STD_LOGIC_VECTOR(31 downto 0);
-        signal Dmem_r_w:        STD_LOGIC;                       --0:read 1:write
+        signal Dmem_r_w_in:     STD_LOGIC;                       --0:read 1:write
         signal Dmem_data_out:   STD_LOGIC_VECTOR(31 downto 0);
-        signal Dmem_valid:      STD_LOGIC;
-        signal Dmem_ready:      STD_LOGIC;
-            
-        signal Imem_addr:       STD_LOGIC_VECTOR(31 downto 0);
-        signal Imem_data_in:    STD_LOGIC_VECTOR(31 downto 0);
-        signal Imem_r_w:        STD_LOGIC;
-        signal Imem_data_out:   STD_LOGIC_VECTOR(31 downto 0);
-        signal Imem_valid:      STD_LOGIC;
-        signal Imem_ready:      STD_LOGIC;
+        signal Dmem_whb_in:     STD_LOGIC_VECTOR(1 downto 0);
     
-    component Memory_driver is
-        Port(
-            --Dmem
-            Dmem_addr_in: IN STD_LOGIC_VECTOR(31 downto 0);
-            Dmem_data_in: IN STD_LOGIC_VECTOR(31 downto 0);
-            Dmem_r_w_in: IN STD_LOGIC;                       --0:read 1:write
-            Dmem_data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-            Dmem_valid_in: IN STD_LOGIC;
-            Dmem_ready_out: OUT STD_LOGIC;
-            --Imem
-            Imem_addr_in:   IN STD_LOGIC_VECTOR(31 downto 0);
-            Imem_data_in:   IN STD_LOGIC_VECTOR(31 downto 0);
-            Imem_r_w_in:    IN STD_LOGIC;
-            Imem_data_out:  OUT STD_LOGIC_VECTOR(31 downto 0);
-            Imem_valid_in:  IN STD_LOGIC;
-            Imem_ready_out: OUT STD_LOGIC;
-            -- MMIO
-            mem_addr_in: OUT STD_LOGIC_VECTOR(31 downto 0);
-            mem_data_in: OUT STD_LOGIC_VECTOR(31 downto 0);
-            mem_r_w_in: OUT STD_LOGIC;                       --0:read 1:write
-            mem_data_out: IN STD_LOGIC_VECTOR(31 downto 0);
-            mem_valid_in: OUT STD_LOGIC;
-            mem_ready_out: IN STD_LOGIC
-        );
-    end component;
-    
-       signal mem_addr_in:      STD_LOGIC_VECTOR(31 downto 0);
-       signal mem_data_in:      STD_LOGIC_VECTOR(31 downto 0);
-       signal mem_r_w_in:       STD_LOGIC;                       --0:read 1:write
-       signal mem_data_out:     STD_LOGIC_VECTOR(31 downto 0);
-       signal mem_valid_in:     STD_LOGIC;
-       signal mem_ready_out:    STD_LOGIC;
-       
     component Memory is
         Port(
-            clk : IN STD_LOGIC;
-            reset : IN STD_LOGIC;
-            addr_in: IN STD_LOGIC_VECTOR(31 downto 0);
-            data_in: IN STD_LOGIC_VECTOR(31 downto 0);
-            r_w_in: IN STD_LOGIC;                       --0:read 1:write
-            data_out: OUT STD_LOGIC_VECTOR(31 downto 0);
-            valid_in: IN STD_LOGIC;
-            ready_out: OUT STD_LOGIC;
-            -- MMIO
-            led_out:        OUT STD_LOGIC_VECTOR(31 downto 0);
-            vga_out:        OUT interface_VGA;
-            uart_in :       IN STD_LOGIC_VECTOR(31 downto 0);
-            uart_out :      OUT STD_LOGIC_VECTOR(31 downto 0);
-            btn_in :        IN STD_LOGIC_VECTOR(31 downto 0);
-            keyboard_in :   IN STD_LOGIC_VECTOR(31 downto 0);
-            seg7_out :      OUT STD_LOGIC_VECTOR(31 downto 0)
+            clk :       IN STD_LOGIC;
+            -- READ PORT
+            addrI_in :  IN STD_LOGIC_VECTOR(31 downto 0);
+            dataI_out : OUT STD_LOGIC_VECTOR(31 downto 0);
+            -- READ/WRITE PORT with byte access
+            addrD_in :  IN STD_LOGIC_VECTOR(31 downto 0);
+            dataD_in :  IN STD_LOGIC_VECTOR(31 downto 0);
+            r_w_in :    IN STD_LOGIC;                               --0:read 1:write
+            whb_in :    IN STD_LOGIC_VECTOR(1 downto 0);            -- word(11)/halfword(10)/byte(01)
+            dataD_out : OUT STD_LOGIC_VECTOR(31 downto 0);
+            --MMIO
+            led_out:    OUT STD_LOGIC_VECTOR(31 downto 0);
+            vga_out:    OUT interface_VGA;
+            uart_in :   IN STD_LOGIC_VECTOR(31 downto 0);
+            uart_out :  OUT STD_LOGIC_VECTOR(31 downto 0);
+            btn_in :    IN STD_LOGIC_VECTOR(31 downto 0);
+            keyboard_in:IN STD_LOGIC_VECTOR(31 downto 0);
+            seg7_out :  OUT STD_LOGIC_VECTOR(31 downto 0)
         );
     end component;
     
@@ -219,58 +176,28 @@ begin
         clk             => clk,           
         reset           => reset, 
     --Imem        
-        Imem_addr_out   => Imem_addr,
-        Imem_data_out   => Imem_data_in, 
-        Imem_r_w_out    => Imem_r_w,
-        Imem_data_in    => Imem_data_out,
-        Imem_valid_out  => Imem_valid,
-        Imem_ready_in   => Imem_ready,
+        Imem_addr_in    => Imem_addr_in,
+        Imem_data_out   => Imem_data_out, 
     --Dmem        
-        Dmem_addr_out   => Dmem_addr,
-        Dmem_data_out   => Dmem_data_in,
-        Dmem_r_w_out    => Dmem_r_w,
-        Dmem_data_in    => Dmem_data_out,
-        Dmem_valid_out  => Dmem_valid,
-        Dmem_ready_in   => Dmem_ready
+        Dmem_addr_in    => Dmem_addr_in,
+        Dmem_data_in    => Dmem_data_in,
+        Dmem_r_w_in     => Dmem_r_w_in,
+        Dmem_whb_in     => Dmem_whb_in,
+        Dmem_data_out   => Dmem_data_out
     );    
     
-    Mem_d : Memory_driver
-    port map(
-    --  PORT            => SIGNAL
-    --Dmem        
-        Dmem_addr_in    =>  Dmem_addr,   
-        Dmem_data_in    =>  Dmem_data_in,  
-        Dmem_r_w_in     =>  Dmem_r_w,   
-        Dmem_data_out   =>  Dmem_data_out, 
-        Dmem_valid_in   =>  Dmem_valid, 
-        Dmem_ready_out  =>  Dmem_ready,
-    --Imem        
-        Imem_addr_in    =>  Imem_addr,  
-        Imem_data_in    =>  Imem_data_in,
-        Imem_r_w_in     =>  Imem_r_w, 
-        Imem_data_out   =>  Imem_data_out,
-        Imem_valid_in   =>  Imem_valid, 
-        Imem_ready_out  =>  Imem_ready,
-    -- mem
-        mem_addr_in     =>  mem_addr_in,
-        mem_data_in     =>  mem_data_in, 
-        mem_r_w_in      =>  mem_r_w_in,
-        mem_data_out    =>  mem_data_out, 
-        mem_valid_in    =>  mem_valid_in,
-        mem_ready_out   =>  mem_ready_out
-    );
     Mem : Memory
     port map(
     --  PORT            => SIGNAL
         --CPU
         clk             => clk,           
-        reset           => reset, 
-        addr_in         => mem_addr_in,
-        data_in         => mem_data_in, 
-        r_w_in          => mem_r_w_in,
-        data_out        => mem_data_out, 
-        valid_in        => mem_valid_in,
-        ready_out       => mem_ready_out,
+        addrI_in        => Imem_addr_in,
+        dataI_out       => Imem_data_out, 
+        addrD_in        => Dmem_addr_in,
+        dataD_in        => Dmem_data_in,
+        r_w_in          => Dmem_r_w_in,
+        whb_in          => Dmem_whb_in,
+        dataD_out       => Dmem_data_out,
         --I/O
         led_out         => led_out,
         vga_out         => vga_out,
