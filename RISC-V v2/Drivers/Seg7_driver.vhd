@@ -13,7 +13,7 @@ end Seg7_driver;
 architecture Behavioral of Seg7_driver is
 constant CNT_MAX : unsigned(11 downto 0) := "111111111100";
 SIGNAL cnt, cnt_next : unsigned(11 downto 0);
-signal  xseg7:  STD_LOGIC_VECTOR(3 downto 0);
+signal  xseg7:  STD_LOGIC_VECTOR(7 downto 0);
 SIGNAL tick : std_logic;
     
 type state_type is (A,B,C,D);
@@ -45,25 +45,25 @@ begin
         next_state <= state_reg;
         case state_reg is
             when A =>
-                xseg7 <= seg7_in(3 downto 0);
+                xseg7 <= seg7_in(7 downto 0);
                 an_out <= "1110";
                 if tick = '1' then
                     next_state <= B;
                 end if;
             when B =>
-                xseg7 <= seg7_in(7 downto 4);
+                xseg7 <= seg7_in(15 downto 8);
                 an_out <= "1101";
                 if tick = '1' then
                     next_state <= C;
                 end if;
             when C =>
-                xseg7 <= seg7_in(11 downto 8);
+                xseg7 <= seg7_in(23 downto 16);
                 an_out <= "1011";
                 if tick = '1' then
                     next_state <= D;
                 end if;
             when D =>
-                xseg7 <= seg7_in(15 downto 12);
+                xseg7 <= seg7_in(31 downto 24);
                 an_out <= "0111";
                 if tick = '1' then
                     next_state <= A;
@@ -73,29 +73,55 @@ begin
   
     process(all) 
     begin
-        if seg7_in(31) = '1' then
-            seg7_out <= "11100011";
-        else
             case xseg7 is
-                when x"0" => seg7_out <= "00000011";
-                when x"1" => seg7_out <= "10011111";
-                when x"2" => seg7_out <= "00100101";
-                when x"3" => seg7_out <= "00001101";
-                when x"4" => seg7_out <= "10011001";
-                when x"5" => seg7_out <= "01001001";
-                when x"6" => seg7_out <= "01000001";
-                when x"7" => seg7_out <= "00011111";
-                when x"8" => seg7_out <= "00000001";
-                when x"9" => seg7_out <= "00011001";
-                when x"a" => seg7_out <= "00010001";
-                when x"b" => seg7_out <= "11000001";
-                when x"c" => seg7_out <= "11100101";
-                when x"d" => seg7_out <= "10000101";
-                when x"e" => seg7_out <= "01100001";
-                when x"f" => seg7_out <= "01110001";
+                when x"00" => seg7_out <= "00000011";
+                when x"01" => seg7_out <= "10011111";
+                when x"02" => seg7_out <= "00100101";
+                when x"03" => seg7_out <= "00001101";
+                when x"04" => seg7_out <= "10011001";
+                when x"05" => seg7_out <= "01001001";
+                when x"06" => seg7_out <= "01000001";
+                when x"07" => seg7_out <= "00011111";
+                when x"08" => seg7_out <= "00000001";
+                when x"09" => seg7_out <= "00011001";
+                when x"0a" => seg7_out <= "00010001";
+                when x"0b" => seg7_out <= "11000001";
+                when x"0c" => seg7_out <= "11100101";
+                when x"0d" => seg7_out <= "10000101";
+                when x"0e" => seg7_out <= "01100001";
+                when x"0f" => seg7_out <= "01110001";
+                
+                when x"90" => seg7_out <= "00000011";--0
+                when x"91" => seg7_out <= "10011111";--1
+                when x"92" => seg7_out <= "00100101";--2
+                when x"93" => seg7_out <= "00001101";--3
+                when x"94" => seg7_out <= "10011001";--4
+                when x"95" => seg7_out <= "01001001";--5
+                when x"96" => seg7_out <= "01000001";--6
+                when x"97" => seg7_out <= "00011111";--7
+                when x"98" => seg7_out <= "00000001";--8
+                when x"99" => seg7_out <= "00011001";--9
+                
+                when x"a1" => seg7_out <= "00010001";--A
+                when x"a2" => seg7_out <= "11000001";--B
+                when x"a3" => seg7_out <= "11100101";--C
+                when x"a4" => seg7_out <= "10000101";--D
+                when x"a5" => seg7_out <= "01100001";--E
+                when x"a6" => seg7_out <= "01110001";--F
+                when x"a8" => seg7_out <= "10010001";--H
+                when x"a9" => seg7_out <= "11110011";--I
+                when x"aa" => seg7_out <= "10000111";--J
+                when x"ac" => seg7_out <= "11100011";--L
+                when x"af" => seg7_out <= "11000101";--O
+                
+                when x"b0" => seg7_out <= "00110001";--P
+                when x"b3" => seg7_out <= "01001001";--S
+                when x"b5" => seg7_out <= "10000011";--U
+                when x"b6" => seg7_out <= "10000010";--V
+                when x"b8" => seg7_out <= "10010000";--X
+                when x"ba" => seg7_out <= "00100100";--Z
                 when others => seg7_out <= "11111110";
             end case;
-        end if;
     end process;
 end Behavioral;
 

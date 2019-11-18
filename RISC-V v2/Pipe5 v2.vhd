@@ -86,8 +86,9 @@ architecture Behavioral of Processor is
     signal A_alu_op : STD_LOGIC_VECTOR(3 downto 0);
     signal A_alu_src_a, A_alu_src_b : STD_LOGIC_VECTOR(31 downto 0);
     signal A_alu_result : STD_LOGIC_VECTOR(31 downto 0);
+    signal A_result : STD_LOGIC_VECTOR(31 downto 0);
 -- M Stage
-    signal M_rs2_data_forw, M_rd_data_A, M_alu_result, M_rd_data_M: STD_LOGIC_VECTOR(31 downto 0);
+    signal M_rs2_data_forw, M_rd_data_A, M_result, M_rd_data_M: STD_LOGIC_VECTOR(31 downto 0);
     signal M_func3 : STD_LOGIC_VECTOR(2 downto 0);
     signal M_rd: STD_LOGIC_VECTOR(4 downto 0);
 -- W Stage
@@ -99,9 +100,10 @@ architecture Behavioral of Processor is
     signal flg_error_branch : STD_LOGIC;
     signal flg_error_alu : STD_LOGIC;
     signal flg_error_ctrl : STD_LOGIC;
-    --branch
+    --branch/comperison
     signal flg_branch : STD_LOGIC;
     signal flg_alu_zero : STD_LOGIC;
+    signal flg_compare, flg_compare_u, flg_compare_result : STD_LOGIC;
     --Flush, stall, hazard
     signal flg_stall, flg_hazard : STD_LOGIC;
     signal flg_flush_I, flg_flush_R : STD_LOGIC;
@@ -117,30 +119,10 @@ begin
     en_PC_reg <= '1';
     en_IR_reg <= not flg_hazard;
     
-    process(all)     -- Main Pipeline registers
+    process(clk)     -- Main Pipeline registers
     begin
-        if reset = '1' then
-            ctrl_A_alu_op           <= "00";
-            ctrl_A_alu_src_a_sel    <= '0';
-            ctrl_A_alu_src_b_sel    <= '0';
-            ctrl_A_rd_w_en          <= '0';
-            ctrl_A_PC4_imm_2reg     <= '0';
-            ctrl_A_branch           <= '0';
-            ctrl_A_jump             <= '0';
-            ctrl_A_mem_w            <= '0';
-            ctrl_A_mem_r            <= '0';
-
-
-            ctrl_M_rd_w_en          <= '0';
-            ctrl_M_PC4_imm_2reg     <= '0';
-            ctrl_M_mem_w            <= '0';
-            ctrl_M_mem_r            <= '0';       
-            
-            ctrl_W_rd_w_en          <= '0';
-            ctrl_W_mem_r            <= '0';
-        elsif rising_edge(clk) then
-            --FLUSH
-            if flg_flush_R = '1' then
+        if rising_edge(clk) then
+            if reset = '1' then
                 ctrl_A_alu_op           <= "00";
                 ctrl_A_alu_src_a_sel    <= '0';
                 ctrl_A_alu_src_b_sel    <= '0';
@@ -150,75 +132,97 @@ begin
                 ctrl_A_jump             <= '0';
                 ctrl_A_mem_w            <= '0';
                 ctrl_A_mem_r            <= '0';
+    
+    
+                ctrl_M_rd_w_en          <= '0';
+                ctrl_M_PC4_imm_2reg     <= '0';
+                ctrl_M_mem_w            <= '0';
+                ctrl_M_mem_r            <= '0';       
+                
+                ctrl_W_rd_w_en          <= '0';
+                ctrl_W_mem_r            <= '0';
             else
-                ctrl_A_alu_op           <= ctrl_R_alu_op;       
-                ctrl_A_alu_src_a_sel    <= ctrl_R_alu_src_a_sel;
-                ctrl_A_alu_src_b_sel    <= ctrl_R_alu_src_b_sel;
-                ctrl_A_rd_w_en          <= ctrl_R_rd_w_en;
-                ctrl_A_PC4_imm_2reg     <= ctrl_R_PC4_imm_2reg;
-                ctrl_A_branch           <= ctrl_R_branch;       
-                ctrl_A_jump             <= ctrl_R_jump;       
-                ctrl_A_mem_w            <= ctrl_R_mem_w;
-                ctrl_A_mem_r            <= ctrl_R_mem_r;
-            end if;   
-                                
-            ctrl_M_rd_w_en      <= ctrl_A_rd_w_en;
-            ctrl_M_PC4_imm_2reg <= ctrl_A_PC4_imm_2reg;
-            ctrl_M_mem_w        <= ctrl_A_mem_w;
-            ctrl_M_mem_r        <= ctrl_A_mem_r;
-            
-            ctrl_W_rd_w_en      <= ctrl_M_rd_w_en;
-            ctrl_W_mem_r        <= ctrl_M_mem_r;
+                --FLUSH
+                if flg_flush_R = '1' then
+                    ctrl_A_alu_op           <= "00";
+                    ctrl_A_alu_src_a_sel    <= '0';
+                    ctrl_A_alu_src_b_sel    <= '0';
+                    ctrl_A_rd_w_en          <= '0';
+                    ctrl_A_PC4_imm_2reg     <= '0';
+                    ctrl_A_branch           <= '0';
+                    ctrl_A_jump             <= '0';
+                    ctrl_A_mem_w            <= '0';
+                    ctrl_A_mem_r            <= '0';
+                else
+                    ctrl_A_alu_op           <= ctrl_R_alu_op;       
+                    ctrl_A_alu_src_a_sel    <= ctrl_R_alu_src_a_sel;
+                    ctrl_A_alu_src_b_sel    <= ctrl_R_alu_src_b_sel;
+                    ctrl_A_rd_w_en          <= ctrl_R_rd_w_en;
+                    ctrl_A_PC4_imm_2reg     <= ctrl_R_PC4_imm_2reg;
+                    ctrl_A_branch           <= ctrl_R_branch;       
+                    ctrl_A_jump             <= ctrl_R_jump;       
+                    ctrl_A_mem_w            <= ctrl_R_mem_w;
+                    ctrl_A_mem_r            <= ctrl_R_mem_r;
+                end if;   
+                                    
+                ctrl_M_rd_w_en      <= ctrl_A_rd_w_en;
+                ctrl_M_PC4_imm_2reg <= ctrl_A_PC4_imm_2reg;
+                ctrl_M_mem_w        <= ctrl_A_mem_w;
+                ctrl_M_mem_r        <= ctrl_A_mem_r;
+                
+                ctrl_W_rd_w_en      <= ctrl_M_rd_w_en;
+                ctrl_W_mem_r        <= ctrl_M_mem_r;
+            end if;
         end if;
     end process;
     
-    process(all)     -- Main Pipeline registers
+    process(clk)     -- Main Pipeline registers
     begin
-        if reset = '1' then
-            R_PC            <= (others => '0');
-            R_PC4           <= (others => '0');
-            A_PC            <= (others => '0');
-            A_PC4           <= (others => '0');
-            A_rs1_data      <= (others => '0');
-            A_rs2_data      <= (others => '0');
-            A_imm           <= (others => '0');
-            A_rs1           <= (others => '0');
-            A_rs2           <= (others => '0');
-            A_rd            <= (others => '0');
-            A_func3         <= (others => '0');
-            A_func7_bit     <= '0';   
-            M_alu_result    <= (others => '0');
-            M_func3         <= (others => '0');
-            M_rs2_data_forw <= (others => '0');
-            M_rd_data_A     <= (others => '0');
-            M_rd            <= (others => '0');
-            W_rd_data_M     <= (others => '0');
-            W_rd            <= (others => '0');     
+        if rising_edge(clk) then
+            if reset = '1' then
+                R_PC            <= (others => '0');
+                R_PC4           <= (others => '0');
+                A_PC            <= (others => '0');
+                A_PC4           <= (others => '0');
+                A_rs1_data      <= (others => '0');
+                A_rs2_data      <= (others => '0');
+                A_imm           <= (others => '0');
+                A_rs1           <= (others => '0');
+                A_rs2           <= (others => '0');
+                A_rd            <= (others => '0');
+                A_func3         <= (others => '0');
+                A_func7_bit     <= '0';   
+                M_result        <= (others => '0');
+                M_func3         <= (others => '0');
+                M_rs2_data_forw <= (others => '0');
+                M_rd_data_A     <= (others => '0');
+                M_rd            <= (others => '0');
+                W_rd_data_M     <= (others => '0');
+                W_rd            <= (others => '0');     
+            else
+                R_PC        <= I_PC;        
+                R_PC4       <= I_PC4;
+                
+                A_PC         <= R_PC;      
+                A_PC4        <= R_PC4;       
+                A_rs1_data   <= R_rs1_data;
+                A_rs2_data   <= R_rs2_data; 
+                A_imm        <= R_imm;       
+                A_rs1        <= R_rs1;       
+                A_rs2        <= R_rs2;       
+                A_rd         <= R_rd;                     
+                A_func3      <= R_func3;
+                A_func7_bit  <= R_func7_bit;
+                
+                M_result        <= A_result;
+                M_rs2_data_forw <= A_rs2_data_forw;
+                M_rd_data_A     <= A_rd_data_A;
+                M_func3         <= A_func3;
+                M_rd            <= A_rd;      
                    
-        elsif rising_edge(clk) then
-
-            R_PC        <= I_PC;        
-            R_PC4       <= I_PC4;
-            
-            A_PC         <= R_PC;      
-            A_PC4        <= R_PC4;       
-            A_rs1_data   <= R_rs1_data;
-            A_rs2_data   <= R_rs2_data; 
-            A_imm        <= R_imm;       
-            A_rs1        <= R_rs1;       
-            A_rs2        <= R_rs2;       
-            A_rd         <= R_rd;                     
-            A_func3      <= R_func3;
-            A_func7_bit  <= R_func7_bit;
-            
-            M_alu_result    <= A_alu_result;
-            M_rs2_data_forw <= A_rs2_data_forw;
-            M_rd_data_A     <= A_rd_data_A;
-            M_func3         <= A_func3;
-            M_rd            <= A_rd;      
-               
-            W_rd_data_M  <= M_rd_data_M;
-            W_rd         <= M_rd;      
+                W_rd_data_M  <= M_rd_data_M;
+                W_rd         <= M_rd;     
+            end if;
         end if;
     end process;
     
@@ -268,18 +272,22 @@ begin
         flg_stall <= '0';
     end process;
     
-    process(all)     -- Registerfile
+    -- Registerfile
+    registers(0) <= (others => '0');
+    process(clk)     
     begin
-        if reset = '1' then
-            registers(2) <= x"00001000";
-        elsif rising_edge(clk) then
-            if ctrl_W_rd_w_en = '1' then
+        if rising_edge(clk) then
+            if reset = '1' then
+                registers(1) <= pc_base;
+                registers(2) <= x"00001000";
+            elsif ctrl_W_rd_w_en = '1' and W_rd /= "00000" then
                 registers(to_integer(unsigned(W_rd))) <= W_rd_data;
             end if;
         end if;
-        
-        registers(0) <= (others => '0');
-
+    end process;
+    
+    process(all)     
+    begin
         -- Register file forwards data if the same register is written to and read from
         if R_rs1 = W_rd and R_rs1 /= "00000" then         -- dont forward when x0
             R_rs1_data <= W_rd_data;
@@ -345,9 +353,10 @@ begin
         end if;
     end process;
     
-    process(all)        --Branch control
+    --BRANCH
+    A_PC_branch <= std_logic_vector(signed(A_PC) + signed(A_imm));
+    Branch_control : process(all)
     begin
-        A_PC_branch <= std_logic_vector(signed(A_PC) + signed(A_imm));
         flg_error_branch <= '0';
         flg_branch <= '0';
         if ctrl_A_branch = '1' then
@@ -357,21 +366,29 @@ begin
                 when "001" => --bne
                     flg_branch <= not flg_alu_zero;
                 when "100" => --blt
-                    flg_branch <= A_alu_result(31);  
+                    flg_branch <= flg_compare_result;  
                 when "101" => --bge
-                    flg_branch <= not A_alu_result(31);
+                    flg_branch <= not flg_compare_result;
                 when "110" => --bltu
-                    flg_branch <= (A_alu_src_a(31) xor A_alu_src_b(31)) xor A_alu_result(31);
+                    flg_branch <= flg_compare_result;
                 when "111" => --bgeu
-                    flg_branch <= not((A_alu_src_a(31) xor A_alu_src_b(31)) xor A_alu_result(31));      
+                    flg_branch <= not flg_compare_result;      
                 when others =>
                     flg_error_branch <= '1';
             end case;
         end if;
-        
     end process;
     
-    process(all)    -- Control
+    Comparison : process(all)
+    begin
+        if flg_compare_u = '1' then
+            flg_compare_result <= (A_alu_src_a(31) xor A_alu_src_b(31)) xor A_alu_result(31);
+        else
+            flg_compare_result <= A_alu_result(31);  
+        end if;
+    end process;
+    
+    Control : process(all)
     begin
          
         ctrl_R_alu_src_a_sel <= '0';
@@ -441,9 +458,9 @@ begin
     -- Memory
     W_mem_data <= Dmem_data_out;
     Dmem_data_in <= M_rs2_data_forw;
-    Dmem_addr_in <= M_alu_result;
+    Dmem_addr_in <= M_result;
     
-    process(all)    -- W/H/B
+    W_H_B : process(all)
     begin       
         if ctrl_M_mem_w = '1' or ctrl_M_mem_r = '1' then
             case M_func3 is
@@ -459,7 +476,7 @@ begin
         end if;
     end process;
     
-    process(all)    -- Read/Write
+    Read_Write : process(all)
     begin       
         if ctrl_M_mem_w = '1' then
             Dmem_r_w_in <= '1';
@@ -479,7 +496,7 @@ begin
         if ctrl_M_PC4_imm_2reg = '1' then
             M_rd_data_M <= M_rd_data_A;
         else
-            M_rd_data_M <= M_alu_result;
+            M_rd_data_M <= M_result;
         end if;
     
         if ctrl_W_mem_r = '1' then
@@ -489,7 +506,8 @@ begin
         end if;
     end process;
     
-    process(all)   -- ALU source multiplexers
+    --ALU
+    ALU_source_multiplexers : process(all)
     begin
         if ctrl_A_alu_src_a_sel = '1' then
             A_alu_src_a <= A_PC;
@@ -503,16 +521,20 @@ begin
         end if;
     end process;    
     
-    process(all)    -- ALU control
+    ALU_control : process(all)
     begin
-        --ALU control
         flg_error_alu <= '0';
         A_alu_op <= "1111";
+        flg_compare <= '0';
+        flg_compare_u <= '0';
         case ctrl_A_alu_op is
             when "00" =>                -- Load/Store ect., use alu to calculate address
                 A_alu_op <= "0010";
             when "01" =>                -- Branch
                 A_alu_op <= "0110";
+                if A_func3 = "111" or A_func3 = "110" then
+                    flg_compare_u <= '1';
+                end if;
             when "10" =>                -- Its an R-instruction
                 case A_func7_bit&A_func3 is 
                     when "0000" =>  --add
@@ -521,10 +543,13 @@ begin
                         A_alu_op <= "0110";
                     when "0001" =>  --sll
                         A_alu_op <= "1000";
---                    when "0010" =>  --slt
---                        A_alu_op <= "";
---                    when "0011" =>  --sltu
---                        A_alu_op <= "";    
+                    when "0010" =>  --slt
+                        A_alu_op <= "0110";
+                        flg_compare <= '1';
+                    when "0011" =>  --sltu
+                        A_alu_op <= "0110"; 
+                        flg_compare <= '1';
+                        flg_compare_u <= '1';
                     when "0100" =>  --xor
                         A_alu_op <= "0111";    
                     when "0101" =>  --srl
@@ -544,10 +569,13 @@ begin
                         A_alu_op <= "0010";
                     when "001" => --slli
                         A_alu_op <= "1000"; 
---                    when "010" => --slti
---                        A_alu_op <= "";         
---                    when "011" => --sltiu
---                        A_alu_op <= "";   
+                    when "010" => --slti
+                        A_alu_op <= "0110";
+                        flg_compare <= '1';
+                    when "011" => --sltiu
+                        A_alu_op <= "0110"; 
+                        flg_compare <= '1';
+                        flg_compare_u <= '1';
                     when "100" => --xori
                         A_alu_op <= "0111";   
                     when "101" => --sr(l/a)i
@@ -569,7 +597,7 @@ begin
         end case;
     end process;
     
-    process(all)    -- ALU
+    ALU : process(all)
     begin        
         -- ALU
         case A_alu_op is
@@ -596,6 +624,15 @@ begin
             flg_alu_zero <= '1';
         else
             flg_alu_zero <= '0';
+        end if;
+    end process;
+    
+    ALU_compare_multiplex : process(all)
+    begin
+        if flg_compare = '1' then
+            A_result <= ((31 downto 1 => '0') & flg_compare_result);
+        else
+            A_result <= A_alu_result;
         end if;
     end process;
     

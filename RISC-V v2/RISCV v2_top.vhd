@@ -66,7 +66,7 @@ architecture Behavioral of RISCV_top is
     
     component Memory is
         Port(
-            clk :       IN STD_LOGIC;
+            clk:        IN STD_LOGIC;  
             -- READ PORT
             addrI_in :  IN STD_LOGIC_VECTOR(31 downto 0);
             dataI_out : OUT STD_LOGIC_VECTOR(31 downto 0);
@@ -78,7 +78,9 @@ architecture Behavioral of RISCV_top is
             dataD_out : OUT STD_LOGIC_VECTOR(31 downto 0);
             --MMIO
             led_out:    OUT STD_LOGIC_VECTOR(31 downto 0);
-            vga_out:    OUT interface_VGA;
+            vga_addr_in:    IN STD_LOGIC_VECTOR(31 downto 0);
+            vga_char_out:   OUT STD_LOGIC_VECTOR(7 downto 0);
+            vga_color_out:   OUT STD_LOGIC_VECTOR(31 downto 0);
             uart_in :   IN STD_LOGIC_VECTOR(31 downto 0);
             uart_out :  OUT STD_LOGIC_VECTOR(31 downto 0);
             btn_in :    IN STD_LOGIC_VECTOR(31 downto 0);
@@ -87,13 +89,15 @@ architecture Behavioral of RISCV_top is
         );
     end component;
     
-          signal  led_out:      STD_LOGIC_VECTOR(31 downto 0);
-          signal  vga_out:      interface_VGA;
-          signal  uart_in :     STD_LOGIC_VECTOR(31 downto 0);
-          signal  uart_out :    STD_LOGIC_VECTOR(31 downto 0);
-          signal  btn_in :      STD_LOGIC_VECTOR(31 downto 0);
-          signal  keyboard_in : STD_LOGIC_VECTOR(31 downto 0);
-          signal  seg7_out :    STD_LOGIC_VECTOR(31 downto 0);
+        signal  led_out:      STD_LOGIC_VECTOR(31 downto 0);
+        signal  vga_addr_in:  STD_LOGIC_VECTOR(31 downto 0);
+        signal  vga_char_out: STD_LOGIC_VECTOR(7 downto 0);
+        signal  vga_color_out:STD_LOGIC_VECTOR(31 downto 0);
+        signal  uart_in :     STD_LOGIC_VECTOR(31 downto 0);
+        signal  uart_out :    STD_LOGIC_VECTOR(31 downto 0);
+        signal  btn_in :      STD_LOGIC_VECTOR(31 downto 0);
+        signal  keyboard_in : STD_LOGIC_VECTOR(31 downto 0);
+        signal  seg7_out :    STD_LOGIC_VECTOR(31 downto 0);
           
     component UART_driver is
         generic(
@@ -114,14 +118,15 @@ architecture Behavioral of RISCV_top is
     
     component VGA_driver is
         Port ( 
-            clk_pixel : in STD_LOGIC;
-            reset : in STD_LOGIC;
-            VGA_IN :         IN interface_VGA;
-            VGA_HS_OUT : out STD_LOGIC;
-            VGA_VS_OUT : out STD_LOGIC;
-            VGA_RED_OUT : out STD_LOGIC_VECTOR (3 downto 0);
-            VGA_BLUE_OUT : out STD_LOGIC_VECTOR (3 downto 0);
-            VGA_GREEN_OUT : out STD_LOGIC_VECTOR (3 downto 0)
+            clk_pixel :      in STD_LOGIC;
+            ADDR_OUT :       out STD_LOGIC_VECTOR(31 downto 0);
+            CHAR_IN :        in STD_LOGIC_VECTOR(7 downto 0);
+            COLOR_IN :       in  STD_LOGIC_VECTOR(31 downto 0);
+            VGA_HS_OUT :     out STD_LOGIC;
+            VGA_VS_OUT :     out STD_LOGIC;
+            VGA_RED_OUT :    out STD_LOGIC_VECTOR (3 downto 0);
+            VGA_BLUE_OUT :   out STD_LOGIC_VECTOR (3 downto 0);
+            VGA_GREEN_OUT :  out STD_LOGIC_VECTOR (3 downto 0)
         );
     end component;
     signal clk_pixel : STD_LOGIC;
@@ -190,7 +195,7 @@ begin
     port map(
     --  PORT            => SIGNAL
         --CPU
-        clk             => clk,           
+        clk             => clk,       
         addrI_in        => Imem_addr_in,
         dataI_out       => Imem_data_out, 
         addrD_in        => Dmem_addr_in,
@@ -200,7 +205,9 @@ begin
         dataD_out       => Dmem_data_out,
         --I/O
         led_out         => led_out,
-        vga_out         => vga_out,
+        vga_addr_in     => vga_addr_in,
+        vga_char_out    => vga_char_out,
+        vga_color_out    => vga_color_out,
         uart_in         => uart_in,
         uart_out        => uart_out,
         btn_in          => btn_in,
@@ -222,8 +229,9 @@ begin
     port map(
     --  PORT            => SIGNAL
         clk_pixel       => clk_pixel,           
-        reset           => reset, 
-        VGA_IN          => vga_out,
+        addr_out        => vga_addr_in,
+        char_in         => vga_char_out,
+        color_in        => vga_color_out,
         VGA_HS_OUT      => VGA_HS_OUT,
         VGA_VS_OUT      => VGA_VS_OUT,  
         VGA_RED_OUT     => VGA_RED_OUT,  

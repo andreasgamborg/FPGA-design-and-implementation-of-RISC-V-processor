@@ -49,11 +49,11 @@ set_property PACKAGE_PIN L1 [get_ports {basys3_led[15]}]
 
 
 ##Buttons
-set_property PACKAGE_PIN T18 [get_ports {basys3_btn[0]}]
-set_property PACKAGE_PIN U17 [get_ports {basys3_btn[1]}]
+set_property PACKAGE_PIN T18 [get_ports {basys3_btn[4]}]
+set_property PACKAGE_PIN U17 [get_ports {basys3_btn[3]}]
 set_property PACKAGE_PIN W19 [get_ports {basys3_btn[2]}]
-set_property PACKAGE_PIN T17 [get_ports {basys3_btn[3]}]
-set_property PACKAGE_PIN U18 [get_ports {basys3_btn[4]}]
+set_property PACKAGE_PIN T17 [get_ports {basys3_btn[1]}]
+set_property PACKAGE_PIN U18 [get_ports {basys3_btn[0]}]
 
 #set_property PACKAGE_PIN U18 [get_ports btnC]
 #set_property PACKAGE_PIN T18 [get_ports btnU]

@@ -1,25 +1,13 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
-use std.textio.all;
 
 library work;
 use work.static.all;
 
---  Xilinx True Dual Port RAM Byte Write Read First Single Clock
---  This code implements a parameterizable true dual port memory (both ports can read and write).
---  The behavior of this RAM is when data is written, the prior memory contents at the write
---  address are presented on the output port.  If the output data is
---  not needed during writes or the last read value is desired to be retained,
---  it is suggested to use a no change RAM as it is more power efficient.
---  If a reset or enable is not necessary, it may be tied off or removed from the code.
-
-
---Insert the following in the architecture before the begin keyword
---  The following function calculates the address width based on specified RAM depth
 entity Memory is
     Port(
-        clk :       IN STD_LOGIC;
+        clk:        IN STD_LOGIC;  
         -- READ PORT
         addrI_in :  IN STD_LOGIC_VECTOR(31 downto 0);
         dataI_out : OUT STD_LOGIC_VECTOR(31 downto 0);
@@ -31,7 +19,9 @@ entity Memory is
         dataD_out : OUT STD_LOGIC_VECTOR(31 downto 0);
         --MMIO
         led_out:    OUT STD_LOGIC_VECTOR(31 downto 0);
-        vga_out:    OUT interface_VGA;
+        vga_addr_in:    IN STD_LOGIC_VECTOR(31 downto 0);
+        vga_char_out:   OUT STD_LOGIC_VECTOR(7 downto 0);
+        vga_color_out:   OUT STD_LOGIC_VECTOR(31 downto 0);
         uart_in :   IN STD_LOGIC_VECTOR(31 downto 0);
         uart_out :  OUT STD_LOGIC_VECTOR(31 downto 0);
         btn_in :    IN STD_LOGIC_VECTOR(31 downto 0);
@@ -44,7 +34,7 @@ architecture Behavioral of Memory is
     
     signal dataDi, dataDo : std_logic_vector(31 downto 0); 
     signal mask, mask_last : std_logic_vector(3 downto 0);     
-    signal addrD, addrI : integer;
+    signal addrD, addrI, addrVGA : integer;
     signal addrD_last, addrI_last : integer;
 
     type RAM_type is array(memory_data_addr to memory_size-1) of STD_LOGIC_VECTOR(31 downto 0);
@@ -62,13 +52,13 @@ architecture Behavioral of Memory is
     signal RAM : RAM_type;
     signal IO : IO_type;
     constant ROM : ROM_type := (
-        x"41000293",x"0fff0337",x"00f30313",x"000013b7",x"8c838393",x"80000e37",x"0062a023",x"01c3a023",
-        x"060000ef",x"00000413",x"000014b7",x"8cc48493",x"00001937",x"8c490913",x"074000ef",x"00a442b3",
-        x"00050413",x"00a2f533",x"00050863",x"00b48023",x"00b90023",x"00148493",x"40000537",x"040000ef",
-        x"fc050ce3",x"00001337",x"8c830313",x"000012b7",x"8cc28293",x"00092023",x"00032023",x"00028067",
-        x"000015b7",x"8c458593",x"41400613",x"00062023",x"00460613",x"fec59ce3",x"00008067",x"40000293",
-        x"0002a583",x"00b57533",x"00008067",x"40800e93",x"000ea583",x"00010337",x"0ff00393",x"0065f533",
-        x"0075f5b3",x"00008067",x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",
+        x"41000293",x"0fff0337",x"00f30313",x"000013b7",x"8c838393",x"acafae37",x"1a4e0e13",x"0062a023",
+        x"01c3a023",x"060000ef",x"00000413",x"000014b7",x"8cc48493",x"00001937",x"8c490913",x"074000ef",
+        x"00a442b3",x"00050413",x"00a2f533",x"00050863",x"00b48023",x"00b90023",x"00148493",x"40000537",
+        x"040000ef",x"fc050ce3",x"00001337",x"8c830313",x"000012b7",x"8cc28293",x"00092023",x"00032023",
+        x"00028067",x"000015b7",x"8c458593",x"41400613",x"00062023",x"00460613",x"fec59ce3",x"00008067",
+        x"40000293",x"0002a583",x"00b57533",x"00008067",x"40800e93",x"000ea583",x"00010337",x"0ff00393",
+        x"0065f533",x"0075f5b3",x"00008067",x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",
         x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",
         x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",
         x"00000000",x"00000000",x"00000000",x"00000000",x"00000000",x"fe010113",x"00112e23",x"00812c23",
@@ -103,6 +93,7 @@ begin
     --Addresses
     addrI <= to_integer(unsigned(addrI_in(11 downto 2)));
     addrD <= to_integer(unsigned(addrD_in(11 downto 2)));
+    addrVGA <= to_integer(unsigned(vga_addr_in(11 downto 2)));
     process(clk)
     begin
         if rising_edge(clk) then
@@ -198,8 +189,16 @@ RAM_enb <= '1' when memory_data_addr <= addrD else '0';
     uart_out <= IO(memory_uart_addr+1);
     led_out <= IO(memory_LED_addr);
     seg7_out <= IO(memory_seg7_addr);
-    vga_out <= interface_vga(IO(memory_video_addr to memory_video_addr+memory_video_size-1));
-
+    vga_color_out <= IO(memory_video_addr);
+    process(all)
+    begin
+        case vga_addr_in(1 downto 0) is
+            when "00" => vga_char_out <= IO(addrVGA)(7 downto 0);
+            when "01" => vga_char_out <= IO(addrVGA)(15 downto 8);
+            when "10" => vga_char_out <= IO(addrVGA)(23 downto 16);
+            when "11" => vga_char_out <= IO(addrVGA)(31 downto 24);
+        end case;
+    end process;
 -----------------------------RAM----------------------------------------
     --INPUT
     RAM_dib   <= dataDi;
