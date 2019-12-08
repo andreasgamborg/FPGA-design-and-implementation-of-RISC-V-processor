@@ -93,6 +93,7 @@ architecture Behavioral of Processor is
     signal M_rd: STD_LOGIC_VECTOR(4 downto 0);
 -- W Stage
     signal W_mem_data, W_rd_data, W_rd_data_M: STD_LOGIC_VECTOR(31 downto 0);
+    signal W_func3 : STD_LOGIC_VECTOR(2 downto 0);
     signal W_rd: STD_LOGIC_VECTOR(4 downto 0);
 
 -- FLAGS
@@ -197,6 +198,7 @@ begin
                 M_rs2_data_forw <= (others => '0');
                 M_rd_data_A     <= (others => '0');
                 M_rd            <= (others => '0');
+                W_func3         <= (others => '0');
                 W_rd_data_M     <= (others => '0');
                 W_rd            <= (others => '0');     
             else
@@ -219,9 +221,10 @@ begin
                 M_rd_data_A     <= A_rd_data_A;
                 M_func3         <= A_func3;
                 M_rd            <= A_rd;      
-                   
-                W_rd_data_M  <= M_rd_data_M;
-                W_rd         <= M_rd;     
+                
+                W_func3         <= M_func3;
+                W_rd_data_M     <= M_rd_data_M;
+                W_rd            <= M_rd;     
             end if;
         end if;
     end process;
@@ -273,7 +276,6 @@ begin
     end process;
     
     -- Registerfile
-    registers(0) <= (others => '0');
     process(clk)     
     begin
         if rising_edge(clk) then
@@ -284,6 +286,7 @@ begin
                 registers(to_integer(unsigned(W_rd))) <= W_rd_data;
             end if;
         end if;
+        registers(0) <= (others => '0');
     end process;
     
     process(all)     
@@ -354,6 +357,7 @@ begin
     end process;
     
     --BRANCH
+    flg_alu_zero <= '1' when A_alu_result = x"00000000" else '0';
     A_PC_branch <= std_logic_vector(signed(A_PC) + signed(A_imm));
     Branch_control : process(all)
     begin
@@ -456,12 +460,23 @@ begin
     end process;
     
     -- Memory
-    W_mem_data <= Dmem_data_out;
+    Load : process(all)
+    begin
+        if W_func3 = "000" then     --signed byte load
+            W_mem_data <= ((31 downto 8 => Dmem_data_out(7)) & Dmem_data_out(7 downto 0));
+        elsif W_func3 = "001" then --signed halfword load
+            W_mem_data <= ((31 downto 16 => Dmem_data_out(15)) & Dmem_data_out(15 downto 0));
+        else
+            W_mem_data <= Dmem_data_out;
+        end if;
+    end process;
+    
+    
     Dmem_data_in <= M_rs2_data_forw;
     Dmem_addr_in <= M_result;
     
     W_H_B : process(all)
-    begin       
+    begin
         if ctrl_M_mem_w = '1' or ctrl_M_mem_r = '1' then
             case M_func3 is
                 when "000" => Dmem_whb_in  <= "01";
@@ -620,11 +635,6 @@ begin
             when others =>
                 A_alu_result <= (others => '0');
         end case;
-        if A_alu_result = x"00000000" then
-            flg_alu_zero <= '1';
-        else
-            flg_alu_zero <= '0';
-        end if;
     end process;
     
     ALU_compare_multiplex : process(all)
