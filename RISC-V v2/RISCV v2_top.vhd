@@ -152,10 +152,14 @@ architecture Behavioral of RISCV_top is
     end component;
     
     component Btn_driver is
+    Generic(
+        clk_freq :          integer := 20e6;     -- Hz
+        debounce_period :   integer := 10       -- ms
+    );
     Port (
         clk :       IN STD_LOGIC;
         switch_in : IN STD_LOGIC_VECTOR(15 downto 0);
-        btn_in :    IN STD_LOGIC_VECTOR(4 downto 0);
+        btn_in :    IN STD_LOGIC_VECTOR(3 downto 0);
         pbtn_in :   IN STD_LOGIC_VECTOR(3 downto 0);
         btn_out :   OUT STD_LOGIC_VECTOR(31 downto 0)
     );
@@ -172,12 +176,14 @@ architecture Behavioral of RISCV_top is
           
 begin
     reset <= basys3_btn(0);
+        
     Clock : clock_gen 
     port map(
         clksys => basys3_clk,
         clk20   => clk,
         clk_pixel => clk_pixel
     );
+    
     CPU : Processor 
     port map(
     --  PORT            => SIGNAL
@@ -262,7 +268,7 @@ begin
     --  PORT            => SIGNAL
         clk             => clk,           
         switch_in       => basys3_switch, 
-        btn_in          => basys3_btn, 
+        btn_in          => basys3_btn(4 downto 1), 
         pbtn_in         => basys3_pbtn, 
         btn_out         => btn_in
     ); 

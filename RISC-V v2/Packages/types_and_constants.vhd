@@ -20,7 +20,8 @@ package Static is
 
     --PC
     constant PC_base :          std_logic_vector(31 downto 0) := x"00000000";
-    constant PC_error :         std_logic_vector(31 downto 0) := x"00000000";
+    constant PC_idle :          std_logic_vector(31 downto 0) := x"00000240";
+    constant PC_error :         std_logic_vector(31 downto 0) := x"00000300";
 
     --Memory
     -- Sizes are in registers of 32-bit

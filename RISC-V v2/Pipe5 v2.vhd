@@ -98,134 +98,81 @@ architecture Behavioral of Processor is
 
 -- FLAGS
     --Error
-    signal flg_error_branch : STD_LOGIC;
-    signal flg_error_alu : STD_LOGIC;
-    signal flg_error_ctrl : STD_LOGIC;
+    signal flg_error, flg_error_branch, flg_error_alu, flg_error_ctrl : STD_LOGIC;
     --branch/comperison
-    signal flg_branch : STD_LOGIC;
-    signal flg_alu_zero : STD_LOGIC;
+    signal flg_branch, flg_alu_zero : STD_LOGIC;
     signal flg_compare, flg_compare_u, flg_compare_result : STD_LOGIC;
     --Flush, stall, hazard
-    signal flg_stall, flg_hazard : STD_LOGIC;
+    signal flg_hazard : STD_LOGIC;
     signal flg_flush_I, flg_flush_R : STD_LOGIC;
-    
--- ENABLE
-    signal en_PC_reg : STD_LOGIC;
-    signal en_IR_reg : STD_LOGIC;
+
 begin
-    --flg_error <= flg_error_alu or flg_error_ctrl or flg_error_branch;
+    flg_error <= flg_error_alu or flg_error_ctrl or flg_error_branch;
     flg_flush_I <= flg_branch or ctrl_A_jump;
     flg_flush_R <= flg_branch or flg_hazard or ctrl_A_jump;
---    en_PC_reg <= ctrl_R_sys or ctrl_A_jump or flg_branch or (flg_stall nor flg_hazard);
-    en_PC_reg <= '1';
-    en_IR_reg <= not flg_hazard;
     
     process(clk)     -- Main Pipeline registers
     begin
         if rising_edge(clk) then
-            if reset = '1' then
-                ctrl_A_alu_op           <= "00";
-                ctrl_A_alu_src_a_sel    <= '0';
-                ctrl_A_alu_src_b_sel    <= '0';
+            --FLUSH
+            if flg_flush_R = '1' then
+                ctrl_A_alu_op           <= "--";
+                ctrl_A_alu_src_a_sel    <= '-';
+                ctrl_A_alu_src_b_sel    <= '-';
                 ctrl_A_rd_w_en          <= '0';
-                ctrl_A_PC4_imm_2reg     <= '0';
+                ctrl_A_PC4_imm_2reg     <= '-';
                 ctrl_A_branch           <= '0';
                 ctrl_A_jump             <= '0';
                 ctrl_A_mem_w            <= '0';
                 ctrl_A_mem_r            <= '0';
-    
-    
-                ctrl_M_rd_w_en          <= '0';
-                ctrl_M_PC4_imm_2reg     <= '0';
-                ctrl_M_mem_w            <= '0';
-                ctrl_M_mem_r            <= '0';       
-                
-                ctrl_W_rd_w_en          <= '0';
-                ctrl_W_mem_r            <= '0';
             else
-                --FLUSH
-                if flg_flush_R = '1' then
-                    ctrl_A_alu_op           <= "00";
-                    ctrl_A_alu_src_a_sel    <= '0';
-                    ctrl_A_alu_src_b_sel    <= '0';
-                    ctrl_A_rd_w_en          <= '0';
-                    ctrl_A_PC4_imm_2reg     <= '0';
-                    ctrl_A_branch           <= '0';
-                    ctrl_A_jump             <= '0';
-                    ctrl_A_mem_w            <= '0';
-                    ctrl_A_mem_r            <= '0';
-                else
-                    ctrl_A_alu_op           <= ctrl_R_alu_op;       
-                    ctrl_A_alu_src_a_sel    <= ctrl_R_alu_src_a_sel;
-                    ctrl_A_alu_src_b_sel    <= ctrl_R_alu_src_b_sel;
-                    ctrl_A_rd_w_en          <= ctrl_R_rd_w_en;
-                    ctrl_A_PC4_imm_2reg     <= ctrl_R_PC4_imm_2reg;
-                    ctrl_A_branch           <= ctrl_R_branch;       
-                    ctrl_A_jump             <= ctrl_R_jump;       
-                    ctrl_A_mem_w            <= ctrl_R_mem_w;
-                    ctrl_A_mem_r            <= ctrl_R_mem_r;
-                end if;   
-                                    
-                ctrl_M_rd_w_en      <= ctrl_A_rd_w_en;
-                ctrl_M_PC4_imm_2reg <= ctrl_A_PC4_imm_2reg;
-                ctrl_M_mem_w        <= ctrl_A_mem_w;
-                ctrl_M_mem_r        <= ctrl_A_mem_r;
-                
-                ctrl_W_rd_w_en      <= ctrl_M_rd_w_en;
-                ctrl_W_mem_r        <= ctrl_M_mem_r;
-            end if;
+                ctrl_A_alu_op           <= ctrl_R_alu_op;       
+                ctrl_A_alu_src_a_sel    <= ctrl_R_alu_src_a_sel;
+                ctrl_A_alu_src_b_sel    <= ctrl_R_alu_src_b_sel;
+                ctrl_A_rd_w_en          <= ctrl_R_rd_w_en;
+                ctrl_A_PC4_imm_2reg     <= ctrl_R_PC4_imm_2reg;
+                ctrl_A_branch           <= ctrl_R_branch;       
+                ctrl_A_jump             <= ctrl_R_jump;       
+                ctrl_A_mem_w            <= ctrl_R_mem_w;
+                ctrl_A_mem_r            <= ctrl_R_mem_r;
+            end if;   
+                                
+            ctrl_M_rd_w_en      <= ctrl_A_rd_w_en;
+            ctrl_M_PC4_imm_2reg <= ctrl_A_PC4_imm_2reg;
+            ctrl_M_mem_w        <= ctrl_A_mem_w;
+            ctrl_M_mem_r        <= ctrl_A_mem_r;
+            
+            ctrl_W_rd_w_en      <= ctrl_M_rd_w_en;
+            ctrl_W_mem_r        <= ctrl_M_mem_r;
         end if;
     end process;
     
     process(clk)     -- Main Pipeline registers
     begin
         if rising_edge(clk) then
-            if reset = '1' then
-                R_PC            <= (others => '0');
-                R_PC4           <= (others => '0');
-                A_PC            <= (others => '0');
-                A_PC4           <= (others => '0');
-                A_rs1_data      <= (others => '0');
-                A_rs2_data      <= (others => '0');
-                A_imm           <= (others => '0');
-                A_rs1           <= (others => '0');
-                A_rs2           <= (others => '0');
-                A_rd            <= (others => '0');
-                A_func3         <= (others => '0');
-                A_func7_bit     <= '0';   
-                M_result        <= (others => '0');
-                M_func3         <= (others => '0');
-                M_rs2_data_forw <= (others => '0');
-                M_rd_data_A     <= (others => '0');
-                M_rd            <= (others => '0');
-                W_func3         <= (others => '0');
-                W_rd_data_M     <= (others => '0');
-                W_rd            <= (others => '0');     
-            else
-                R_PC        <= I_PC;        
-                R_PC4       <= I_PC4;
-                
-                A_PC         <= R_PC;      
-                A_PC4        <= R_PC4;       
-                A_rs1_data   <= R_rs1_data;
-                A_rs2_data   <= R_rs2_data; 
-                A_imm        <= R_imm;       
-                A_rs1        <= R_rs1;       
-                A_rs2        <= R_rs2;       
-                A_rd         <= R_rd;                     
-                A_func3      <= R_func3;
-                A_func7_bit  <= R_func7_bit;
-                
-                M_result        <= A_result;
-                M_rs2_data_forw <= A_rs2_data_forw;
-                M_rd_data_A     <= A_rd_data_A;
-                M_func3         <= A_func3;
-                M_rd            <= A_rd;      
-                
-                W_func3         <= M_func3;
-                W_rd_data_M     <= M_rd_data_M;
-                W_rd            <= M_rd;     
-            end if;
+            R_PC        <= I_PC;        
+            R_PC4       <= I_PC4;
+            
+            A_PC         <= R_PC;      
+            A_PC4        <= R_PC4;       
+            A_rs1_data   <= R_rs1_data;
+            A_rs2_data   <= R_rs2_data; 
+            A_imm        <= R_imm;       
+            A_rs1        <= R_rs1;       
+            A_rs2        <= R_rs2;       
+            A_rd         <= R_rd;                     
+            A_func3      <= R_func3;
+            A_func7_bit  <= R_func7_bit;
+            
+            M_result        <= A_result;
+            M_rs2_data_forw <= A_rs2_data_forw;
+            M_rd_data_A     <= A_rd_data_A;
+            M_func3         <= A_func3;
+            M_rd            <= A_rd;      
+            
+            W_func3         <= M_func3;
+            W_rd_data_M     <= M_rd_data_M;
+            W_rd            <= M_rd;     
         end if;
     end process;
     
@@ -236,7 +183,7 @@ begin
         elsif ctrl_A_jump = '1' then
             I_PC_next <= A_alu_result; 
         elsif ctrl_R_sys = '1' then
-            I_PC_next <= PC_base;
+            I_PC_next <= PC_idle;
         else
             I_PC_next <= I_PC4; 
         end if;
@@ -249,7 +196,9 @@ begin
         if rising_edge(clk) then
             if reset = '1' then
                 I_PC_reg <= pc_base;
-            elsif en_PC_reg = '1' then
+            elsif flg_error = '1' then
+                I_PC_reg <= pc_error;
+            else
                 I_PC_reg <= I_PC_next;
             end if;
         end if;
@@ -263,26 +212,22 @@ begin
             I_PC <= R_PC;
         end if;
     end process;
-    
-    process(all)     -- Instruction memory
+    -- Instruction memory
+    Inst_mem_addr : process(all)    
     begin
         if flg_flush_I = '1' then
             Imem_addr_in <= x"10000000";
         else
             Imem_addr_in <= I_PC;
         end if;
-        R_inst <= Imem_data_out;
-        flg_stall <= '0';
     end process;
-    
+    R_inst <= Imem_data_out;
+
     -- Registerfile
     process(clk)     
     begin
         if rising_edge(clk) then
-            if reset = '1' then
-                registers(1) <= pc_base;
-                registers(2) <= x"00001000";
-            elsif ctrl_W_rd_w_en = '1' and W_rd /= "00000" then
+            if ctrl_W_rd_w_en = '1' then
                 registers(to_integer(unsigned(W_rd))) <= W_rd_data;
             end if;
         end if;
@@ -393,8 +338,7 @@ begin
     end process;
     
     Control : process(all)
-    begin
-         
+    begin 
         ctrl_R_alu_src_a_sel <= '0';
         ctrl_R_alu_src_b_sel <= '0';
         ctrl_R_alu_op <= "00";
@@ -415,6 +359,7 @@ begin
                 ctrl_R_alu_src_b_sel <= '1';
                 ctrl_R_rd_w_en <= '1';
                 ctrl_R_mem_r <= '1';
+                ctrl_R_PC4_imm_2reg <= '-';
             when opcode_imm =>          -- I-type
                 ctrl_R_alu_src_b_sel <= '1';
                 ctrl_R_alu_op <= "11";
@@ -422,14 +367,20 @@ begin
             when opcode_store =>        -- Store
                 ctrl_R_alu_src_b_sel <= '1';
                 ctrl_R_mem_w <= '1';
+                ctrl_R_PC4_imm_2reg <= '-';
             when opcode_r =>            -- R-type
                 ctrl_R_alu_op <= "10";
                 ctrl_R_rd_w_en <= '1';
             when opcode_branch =>       -- Branch
                 ctrl_R_alu_op <= "01";
-                ctrl_R_branch <= '1';       
+                ctrl_R_branch <= '1';
+                ctrl_R_PC4_imm_2reg <= '-';   
             when opcode_sys =>          -- ecall
                 ctrl_R_sys <= '1';
+                ctrl_R_PC4_imm_2reg <= '-';
+                ctrl_R_alu_src_a_sel <= '-';
+                ctrl_R_alu_src_b_sel <= '-';
+                ctrl_R_alu_op <= "--";
             when opcode_auipc =>        -- auipc
                 ctrl_R_alu_src_a_sel <= '1';
                 ctrl_R_alu_src_b_sel <= '1';
@@ -437,6 +388,9 @@ begin
             when opcode_lui =>          -- lui
                 ctrl_R_rd_w_en <= '1';
                 ctrl_R_PC4_imm_2reg <= '1';
+                ctrl_R_alu_src_a_sel <= '-';
+                ctrl_R_alu_src_b_sel <= '-';
+                ctrl_R_alu_op <= "--";
             when opcode_jalr =>         -- jalr
                 ctrl_R_alu_src_b_sel <= '1';
                 ctrl_R_rd_w_en <= '1';
@@ -444,6 +398,10 @@ begin
                 ctrl_R_PC4_imm_2reg <= '1';  
             when opcode_fence =>        -- fence
                 ctrl_R_sys <= '1';
+                ctrl_R_PC4_imm_2reg <= '-';
+                ctrl_R_alu_src_a_sel <= '-';
+                ctrl_R_alu_src_b_sel <= '-';
+                ctrl_R_alu_op <= "--";
             when opcode_jal =>          -- jal
                 ctrl_R_alu_src_a_sel <= '1';
                 ctrl_R_alu_src_b_sel <= '1';
@@ -539,9 +497,8 @@ begin
     ALU_control : process(all)
     begin
         flg_error_alu <= '0';
-        A_alu_op <= "1111";
         flg_compare <= '0';
-        flg_compare_u <= '0';
+        flg_compare_u <= '-';
         case ctrl_A_alu_op is
             when "00" =>                -- Load/Store ect., use alu to calculate address
                 A_alu_op <= "0010";
@@ -549,6 +506,8 @@ begin
                 A_alu_op <= "0110";
                 if A_func3 = "111" or A_func3 = "110" then
                     flg_compare_u <= '1';
+                else
+                    flg_compare_u <= '0';
                 end if;
             when "10" =>                -- Its an R-instruction
                 case A_func7_bit&A_func3 is 
@@ -561,6 +520,7 @@ begin
                     when "0010" =>  --slt
                         A_alu_op <= "0110";
                         flg_compare <= '1';
+                        flg_compare_u <= '0';
                     when "0011" =>  --sltu
                         A_alu_op <= "0110"; 
                         flg_compare <= '1';
@@ -576,7 +536,7 @@ begin
                     when "0111" =>  --and
                         A_alu_op <= "0000";                        
                     when others => 
-                        flg_error_alu <= '1';
+                        A_alu_op <= "1111";
                 end case;
             when "11" =>                -- Its an I-instruction
                 case A_func3 is 
@@ -603,12 +563,11 @@ begin
                         A_alu_op <= "0001";                
                     when "111" => --andi
                         A_alu_op <= "0000";
-
                     when others => 
-                        flg_error_alu <= '1';
+                        A_alu_op <= "1111";
                 end case;
             when others => 
-                flg_error_alu <= '1';  
+                A_alu_op <= "1111";
         end case;
     end process;
     
