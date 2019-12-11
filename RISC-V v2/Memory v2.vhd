@@ -93,7 +93,7 @@ begin
     --Addresses
     addrI <= to_integer(unsigned(addrI_in(11 downto 2)));
     addrD <= to_integer(unsigned(addrD_in(11 downto 2)));
-    addrVGA <= to_integer(unsigned(vga_addr_in(11 downto 2)));
+    addrVGA <= to_integer(unsigned(vga_addr_in(11 downto 2)))+memory_video_addr+1;
     process(clk)
     begin
         if rising_edge(clk) then
@@ -192,12 +192,17 @@ RAM_enb <= '1' when memory_data_addr <= addrD else '0';
     vga_color_out <= IO(memory_video_addr);
     process(all)
     begin
-        case vga_addr_in(1 downto 0) is
-            when "00" => vga_char_out <= IO(addrVGA)(7 downto 0);
-            when "01" => vga_char_out <= IO(addrVGA)(15 downto 8);
-            when "10" => vga_char_out <= IO(addrVGA)(23 downto 16);
-            when "11" => vga_char_out <= IO(addrVGA)(31 downto 24);
-        end case;
+        if(addrVGA < memory_LED_addr) then
+            case vga_addr_in(1 downto 0) is
+                when "00" => vga_char_out <= IO(addrVGA)(7 downto 0);
+                when "01" => vga_char_out <= IO(addrVGA)(15 downto 8);
+                when "10" => vga_char_out <= IO(addrVGA)(23 downto 16);
+                when "11" => vga_char_out <= IO(addrVGA)(31 downto 24);
+                when others => vga_char_out <= (others => '0');
+            end case;
+        else
+            vga_char_out <= (others => '0');
+        end if;
     end process;
 -----------------------------RAM----------------------------------------
     --INPUT

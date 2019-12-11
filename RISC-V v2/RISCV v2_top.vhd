@@ -159,7 +159,7 @@ architecture Behavioral of RISCV_top is
     Port (
         clk :       IN STD_LOGIC;
         switch_in : IN STD_LOGIC_VECTOR(15 downto 0);
-        btn_in :    IN STD_LOGIC_VECTOR(3 downto 0);
+        btn_in :    IN STD_LOGIC_VECTOR(4 downto 0);
         pbtn_in :   IN STD_LOGIC_VECTOR(3 downto 0);
         btn_out :   OUT STD_LOGIC_VECTOR(31 downto 0)
     );
@@ -175,7 +175,7 @@ architecture Behavioral of RISCV_top is
     end component;
           
 begin
-    reset <= basys3_btn(0);
+    reset <= btn_in(27);
         
     Clock : clock_gen 
     port map(
@@ -268,7 +268,7 @@ begin
     --  PORT            => SIGNAL
         clk             => clk,           
         switch_in       => basys3_switch, 
-        btn_in          => basys3_btn(4 downto 1), 
+        btn_in          => basys3_btn, 
         pbtn_in         => basys3_pbtn, 
         btn_out         => btn_in
     ); 

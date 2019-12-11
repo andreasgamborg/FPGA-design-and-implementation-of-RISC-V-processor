@@ -93,29 +93,36 @@ begin
 
     process is
     begin
-        basys3_btn <= "00001";
-        wait for 200 ns;
-        basys3_btn <= "00000";
-        wait for 550 us;
-
-        UART_WRITE_BYTE(X"13", RsRx);
-        UART_WRITE_BYTE(X"00", RsRx);
-        UART_WRITE_BYTE(X"00", RsRx);
-        UART_WRITE_BYTE(X"00", RsRx);
-
-        UART_WRITE_BYTE(X"93", RsRx);
-        UART_WRITE_BYTE(X"02", RsRx);
-        UART_WRITE_BYTE(X"00", RsRx);
-        UART_WRITE_BYTE(X"41", RsRx);
+        wait for 10 ms;
         
-        UART_WRITE_BYTE(X"37", RsRx);
-        UART_WRITE_BYTE(X"03", RsRx);
-        UART_WRITE_BYTE(X"ff", RsRx);
-        UART_WRITE_BYTE(X"0f", RsRx);
+--        UART_WRITE_BYTE(X"13", RsRx);
+--        UART_WRITE_BYTE(X"04", RsRx);
+--        UART_WRITE_BYTE(X"00", RsRx);
+--        UART_WRITE_BYTE(X"14", RsRx);
+
+--        UART_WRITE_BYTE(X"13", RsRx);
+--        UART_WRITE_BYTE(X"05", RsRx);
+--        UART_WRITE_BYTE(X"30", RsRx);
+--        UART_WRITE_BYTE(X"00", RsRx);
         
-        wait for 500us;
-        basys3_pbtn <= "1111";
-        wait for 100us;
+--        UART_WRITE_BYTE(X"93", RsRx);
+--        UART_WRITE_BYTE(X"05", RsRx);
+--        UART_WRITE_BYTE(X"30", RsRx);
+--        UART_WRITE_BYTE(X"00", RsRx);
+
+--        UART_WRITE_BYTE(X"13", RsRx);
+--        UART_WRITE_BYTE(X"06", RsRx);
+--        UART_WRITE_BYTE(X"30", RsRx);
+--        UART_WRITE_BYTE(X"03", RsRx);
+        
+--        UART_WRITE_BYTE(X"e7", RsRx);
+--        UART_WRITE_BYTE(X"00", RsRx);
+--        UART_WRITE_BYTE(X"04", RsRx);
+--        UART_WRITE_BYTE(X"00", RsRx);
+        
+--        wait for 500us;
+--        basys3_btn <= "01000";
+--        wait for 100us;
 
     end process;
     

@@ -11,7 +11,7 @@ entity Btn_driver is
     Port(  
         clk :          IN STD_LOGIC;
         switch_in :    IN STD_LOGIC_VECTOR(15 downto 0);
-        btn_in :       IN STD_LOGIC_VECTOR(3 downto 0);
+        btn_in :       IN STD_LOGIC_VECTOR(4 downto 0);
         pbtn_in  :     IN STD_LOGIC_VECTOR(3 downto 0);
         btn_out :      OUT STD_LOGIC_VECTOR(31 downto 0)
     );
@@ -25,7 +25,7 @@ architecture Behavioral of Btn_driver is
     signal cnt, cnt_next : unsigned(31 downto 0);
     
 begin
-    xxbtn <= btn_in & "0000" & pbtn_in & "0000" & switch_in;
+    xxbtn <= btn_in & "000" & pbtn_in & "0000" & switch_in;
     --Syncronize inputs
     process(clk)
     begin

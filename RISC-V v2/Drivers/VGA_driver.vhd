@@ -92,7 +92,7 @@ begin
         end if;
     end process;
     
-    ADDR_OUT <= std_logic_vector(addr + to_unsigned(memory_video_addr*4,32)+4);
+    ADDR_OUT <= std_logic_vector(addr);
     VGA_HS_OUT <= HS;
     VGA_VS_OUT <= VS;
 end Behavioral;
