@@ -98,7 +98,7 @@ architecture Behavioral of Processor is
 
 -- FLAGS
     --Error
-    signal flg_error, flg_error_branch, flg_error_alu, flg_error_ctrl : STD_LOGIC;
+    signal flg_error, flg_error_branch, flg_error_ctrl : STD_LOGIC;
     --branch/comperison
     signal flg_branch, flg_alu_zero : STD_LOGIC;
     signal flg_compare, flg_compare_u, flg_compare_result : STD_LOGIC;
@@ -107,7 +107,7 @@ architecture Behavioral of Processor is
     signal flg_flush_I, flg_flush_R : STD_LOGIC;
 
 begin
-    flg_error <= flg_error_alu or flg_error_ctrl or flg_error_branch;
+    flg_error   <= flg_error_ctrl or flg_error_branch;
     flg_flush_I <= flg_branch or ctrl_A_jump;
     flg_flush_R <= flg_branch or flg_hazard or ctrl_A_jump;
     
@@ -178,7 +178,11 @@ begin
     
     process(all) -- PC next multiplexers
     begin
-        if flg_branch = '1' then
+        if reset = '1' then
+            I_PC_next <= pc_base;
+        elsif flg_error = '1' then
+            I_PC_next <= pc_error;
+        elsif flg_branch = '1' then
             I_PC_next <= A_PC_branch;
         elsif ctrl_A_jump = '1' then
             I_PC_next <= A_alu_result; 
@@ -194,13 +198,7 @@ begin
     process(clk)     -- PC
     begin
         if rising_edge(clk) then
-            if reset = '1' then
-                I_PC_reg <= pc_base;
-            elsif flg_error = '1' then
-                I_PC_reg <= pc_error;
-            else
-                I_PC_reg <= I_PC_next;
-            end if;
+            I_PC_reg <= I_PC_next;
         end if;
     end process;
     
@@ -496,7 +494,6 @@ begin
     
     ALU_control : process(all)
     begin
-        flg_error_alu <= '0';
         flg_compare <= '0';
         flg_compare_u <= '-';
         case ctrl_A_alu_op is
