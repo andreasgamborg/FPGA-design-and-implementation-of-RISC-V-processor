@@ -101,6 +101,8 @@ set_property PACKAGE_PIN A18 [get_ports RsTx]
 ##USB HID (PS/2)
 set_property PACKAGE_PIN C17 [get_ports PS2Clk]
 set_property PULLUP true [get_ports PS2Clk]
+create_clock -period 40000 -name keyboard_clk_pin -waveform {0 20000} -add [get_ports PS2Clk]
+
 set_property PACKAGE_PIN B17 [get_ports PS2Data]
 set_property PULLUP true [get_ports PS2Data]
 

@@ -63,9 +63,8 @@ architecture Behavioral of Processor is
     signal ctrl_W_mem_r: STD_LOGIC;
 
 -- MAIN PIPELINE
-    signal I_PC_next, A_PC_branch : STD_LOGIC_VECTOR(31 downto 0);
 -- I Stage
-    signal I_PC, I_PC4, I_PC_reg : STD_LOGIC_VECTOR(31 downto 0);
+    signal I_PC : STD_LOGIC_VECTOR(31 downto 0);
 -- R Stage
     signal R_inst, R_PC, R_PC4 : STD_LOGIC_VECTOR(31 downto 0);
     signal R_rs1_data, R_rs2_data, R_imm : STD_LOGIC_VECTOR(31 downto 0);
@@ -74,7 +73,7 @@ architecture Behavioral of Processor is
     signal R_func3 : STD_LOGIC_VECTOR(2 downto 0);
     signal R_func7_bit : STD_LOGIC;
 -- A Stage
-    signal A_PC : STD_LOGIC_VECTOR(31 downto 0);
+    signal A_PC, A_PC_branch : STD_LOGIC_VECTOR(31 downto 0);
     signal A_rs1_data, A_rs2_data : STD_LOGIC_VECTOR(31 downto 0);
     signal A_imm, A_PC4, A_rd_data_A : STD_LOGIC_VECTOR(31 downto 0);
     signal A_rd, A_rs1, A_rs2 : STD_LOGIC_VECTOR(4 downto 0);
@@ -104,16 +103,23 @@ architecture Behavioral of Processor is
     signal flg_compare, flg_compare_u, flg_compare_result : STD_LOGIC;
     --Flush, stall, hazard
     signal flg_hazard : STD_LOGIC;
-    signal flg_flush_I, flg_flush_R : STD_LOGIC;
+    signal flg_flush_R : STD_LOGIC;
 
 begin
     flg_error   <= flg_error_ctrl or flg_error_branch;
-    flg_flush_I <= flg_branch or ctrl_A_jump;
     flg_flush_R <= flg_branch or flg_hazard or ctrl_A_jump;
     
     process(clk)     -- Main Pipeline registers
     begin
         if rising_edge(clk) then
+            ctrl_W_rd_w_en      <= ctrl_M_rd_w_en;
+            ctrl_W_mem_r        <= ctrl_M_mem_r;      
+                          
+            ctrl_M_rd_w_en      <= ctrl_A_rd_w_en;
+            ctrl_M_PC4_imm_2reg <= ctrl_A_PC4_imm_2reg;
+            ctrl_M_mem_w        <= ctrl_A_mem_w;
+            ctrl_M_mem_r        <= ctrl_A_mem_r;
+            
             --FLUSH
             if flg_flush_R = '1' then
                 ctrl_A_alu_op           <= "--";
@@ -136,22 +142,21 @@ begin
                 ctrl_A_mem_w            <= ctrl_R_mem_w;
                 ctrl_A_mem_r            <= ctrl_R_mem_r;
             end if;   
-                                
-            ctrl_M_rd_w_en      <= ctrl_A_rd_w_en;
-            ctrl_M_PC4_imm_2reg <= ctrl_A_PC4_imm_2reg;
-            ctrl_M_mem_w        <= ctrl_A_mem_w;
-            ctrl_M_mem_r        <= ctrl_A_mem_r;
-            
-            ctrl_W_rd_w_en      <= ctrl_M_rd_w_en;
-            ctrl_W_mem_r        <= ctrl_M_mem_r;
         end if;
     end process;
     
     process(clk)     -- Main Pipeline registers
     begin
         if rising_edge(clk) then
-            R_PC        <= I_PC;        
-            R_PC4       <= I_PC4;
+            W_func3         <= M_func3;
+            W_rd_data_M     <= M_rd_data_M;
+            W_rd            <= M_rd;
+            
+            M_result        <= A_result;
+            M_rs2_data_forw <= A_rs2_data_forw;
+            M_rd_data_A     <= A_rd_data_A;
+            M_func3         <= A_func3;
+            M_rd            <= A_rd;   
             
             A_PC         <= R_PC;      
             A_PC4        <= R_PC4;       
@@ -162,63 +167,35 @@ begin
             A_rs2        <= R_rs2;       
             A_rd         <= R_rd;                     
             A_func3      <= R_func3;
-            A_func7_bit  <= R_func7_bit;
+            A_func7_bit  <= R_func7_bit;  
             
-            M_result        <= A_result;
-            M_rs2_data_forw <= A_rs2_data_forw;
-            M_rd_data_A     <= A_rd_data_A;
-            M_func3         <= A_func3;
-            M_rd            <= A_rd;      
-            
-            W_func3         <= M_func3;
-            W_rd_data_M     <= M_rd_data_M;
-            W_rd            <= M_rd;     
+            R_PC        <= I_PC;          
         end if;
     end process;
     
     process(all) -- PC next multiplexers
     begin
         if reset = '1' then
-            I_PC_next <= pc_base;
+            I_PC <= pc_base;
         elsif flg_error = '1' then
-            I_PC_next <= pc_error;
-        elsif flg_branch = '1' then
-            I_PC_next <= A_PC_branch;
-        elsif ctrl_A_jump = '1' then
-            I_PC_next <= A_alu_result; 
-        elsif ctrl_R_sys = '1' then
-            I_PC_next <= PC_idle;
-        else
-            I_PC_next <= I_PC4; 
-        end if;
-    end process;
-    
-    I_PC4 <= std_logic_vector(unsigned(I_PC) + 4);
-
-    process(clk)     -- PC
-    begin
-        if rising_edge(clk) then
-            I_PC_reg <= I_PC_next;
-        end if;
-    end process;
-    
-    process(all)     -- Stall
-    begin
-        if flg_hazard = '0' then
-            I_PC <= I_PC_reg;
-        else
+            I_PC <= pc_error;
+        elsif flg_hazard = '1' then
             I_PC <= R_PC;
-        end if;
-    end process;
-    -- Instruction memory
-    Inst_mem_addr : process(all)    
-    begin
-        if flg_flush_I = '1' then
-            Imem_addr_in <= x"10000000";
+        elsif flg_branch = '1' then
+            I_PC <= A_PC_branch;
+        elsif ctrl_A_jump = '1' then
+            I_PC <= A_alu_result; 
+        elsif ctrl_R_sys = '1' then
+            I_PC <= PC_idle;
         else
-            Imem_addr_in <= I_PC;
+            I_PC <= R_PC4; 
         end if;
     end process;
+    
+    R_PC4 <= std_logic_vector(unsigned(R_PC) + 4);
+
+    -- Instruction memory
+    Imem_addr_in <= I_PC;
     R_inst <= Imem_data_out;
 
     -- Registerfile

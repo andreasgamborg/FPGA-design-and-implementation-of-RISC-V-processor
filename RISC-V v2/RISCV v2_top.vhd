@@ -134,7 +134,7 @@ architecture Behavioral of RISCV_top is
     
     component Keyboard_driver is
     Port (  
-        clk, reset :        IN STD_LOGIC;
+        clk :        IN STD_LOGIC;
         PS2Clk, PS2Data :   IN STD_LOGIC;
         keyboard_out :      OUT std_logic_vector(31 downto 0)
     );
@@ -251,7 +251,6 @@ begin
     port map(
     --  PORT            => SIGNAL
         clk             => clk,           
-        reset           => reset, 
         PS2Clk          => PS2Clk,
         PS2Data         => PS2Data,
         keyboard_out    => keyboard_in

@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity Keyboard_driver is
     Port (  
-        clk, reset : IN STD_LOGIC;
+        clk : IN STD_LOGIC;
         PS2Clk, PS2Data : IN STD_LOGIC;
         keyboard_out : OUT std_logic_vector(31 downto 0)
     );
