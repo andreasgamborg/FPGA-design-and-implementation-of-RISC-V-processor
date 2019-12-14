@@ -218,7 +218,7 @@ begin
         R_rs1_data <= registers(to_integer(unsigned(R_rs1)));
         R_rs2_data <= registers(to_integer(unsigned(R_rs2)));
 
-        if W_rd /= "00000" then         -- dont forward when x0
+        if W_rd /= "00000" and ctrl_W_rd_w_en = '1' then         -- dont forward when x0
             if R_rs1 = W_rd then
                 R_rs1_data <= W_rd_data;
             end if;
