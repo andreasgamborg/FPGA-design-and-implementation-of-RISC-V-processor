@@ -145,7 +145,7 @@ begin
 ROM_en <= '1' when addrI < memory_BTN_addr else '0';
 IO_en <= '1' when (memory_BTN_addr <= addrD and addrD < memory_data_addr) else '0';
 RAM_ena <= '1' when memory_data_addr <= addrI else '0';
-RAM_enb <= '1' when memory_data_addr <= addrD else '0';
+RAM_enb <= '1' when memory_data_addr <= addrD and (whb_in /= "00") else '0';
 
 -----------------------------ROM----------------------------------------
     process(clk)
@@ -153,8 +153,6 @@ RAM_enb <= '1' when memory_data_addr <= addrD else '0';
         if rising_edge(clk) then
             if ROM_en = '1' and Memory_error_addrI_OutOfBound = '0' then
                 ROM_do <= ROM(addrI);
-            else
-                ROM_do <= (others => '0');
             end if;
         end if;
     end process;
@@ -165,6 +163,7 @@ RAM_enb <= '1' when memory_data_addr <= addrD else '0';
     begin
         if rising_edge(clk) then
             if IO_en = '1' and Memory_error_addrD_OutOfBound = '0' then
+                IO_do <=  IO(addrD);
                 if r_w_in = '1' and Memory_error_addrD_ReadOnly = '0' then
                     for ii in 0 to 3 loop
                         if mask(ii)='1' then
@@ -172,13 +171,6 @@ RAM_enb <= '1' when memory_data_addr <= addrD else '0';
                         end if;
                     end loop;
                 end if;
-                if r_w_in = '0' then
-                    IO_do <=  IO(addrD);
-                else
-                    IO_do <= (others => '0');
-                end if;
-            else
-                IO_do <= (others => '0');
             end if;
             IO(memory_uart_addr) <= uart_in;
             IO(memory_btn_addr) <= btn_in;
@@ -213,8 +205,6 @@ RAM_enb <= '1' when memory_data_addr <= addrD else '0';
         if rising_edge(clk) then
             if RAM_ena = '1' and Memory_error_addrI_OutOfBound = '0' then
                 RAM_doa <= RAM(addrI);
-            else
-                RAM_doa <= (others => '0');
             end if;
         end if;
     end process;
@@ -223,6 +213,7 @@ RAM_enb <= '1' when memory_data_addr <= addrD else '0';
     begin
         if rising_edge(clk) then
             if RAM_enb = '1' and Memory_error_addrD_OutOfBound = '0' then
+                RAM_dob <= RAM(addrD);
                 if r_w_in = '1' and Memory_error_addrD_ReadOnly = '0' then
                     for ii in 0 to 3 loop
                         if mask(ii)='1' then
@@ -230,13 +221,6 @@ RAM_enb <= '1' when memory_data_addr <= addrD else '0';
                         end if;
                     end loop;
                 end if;
-                if r_w_in = '0' then
-                    RAM_dob <= RAM(addrD);
-                else
-                    RAM_dob <= (others => '0');
-                end if;
-            else
-                RAM_dob <= (others => '0');
             end if;
         end if;
     end process;
