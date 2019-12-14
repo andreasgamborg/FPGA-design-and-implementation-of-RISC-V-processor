@@ -107,7 +107,10 @@ architecture Behavioral of Processor is
 
 begin
     flg_error   <= flg_error_ctrl or flg_error_branch;
+    --Flush control register in stage R
     flg_flush_R <= flg_branch or flg_hazard or ctrl_A_jump;
+    --Hazard detection
+    flg_hazard <= '1' when ctrl_A_mem_r = '1' and (R_rs1 = A_rd or R_rs2 = A_rd) else '0';
     
     process(clk)     -- Main Pipeline registers
     begin
@@ -212,16 +215,16 @@ begin
     process(all)     
     begin
         -- Register file forwards data if the same register is written to and read from
-        if R_rs1 = W_rd and R_rs1 /= "00000" then         -- dont forward when x0
-            R_rs1_data <= W_rd_data;
-        else
-            R_rs1_data <= registers(to_integer(unsigned(R_rs1)));
-        end if;
-        
-        if R_rs2 = W_rd and R_rs2 /= "00000" then          -- dont forward when x0
-            R_rs2_data <= W_rd_data;
-        else
-            R_rs2_data <= registers(to_integer(unsigned(R_rs2)));
+        R_rs1_data <= registers(to_integer(unsigned(R_rs1)));
+        R_rs2_data <= registers(to_integer(unsigned(R_rs2)));
+
+        if W_rd /= "00000" then         -- dont forward when x0
+            if R_rs1 = W_rd then
+                R_rs1_data <= W_rd_data;
+            end if;
+            if R_rs2 = W_rd then 
+                R_rs2_data <= W_rd_data;
+            end if;
         end if;
     end process;
     
@@ -260,22 +263,7 @@ begin
             A_rs2_data_forw <= A_rs2_data;
         end if;
     end process;
-    
-    process(all)     -- Hazard detection
-    begin
-        if ctrl_A_mem_r = '1' then
-            if A_rd = "00000" then
-                flg_hazard <= '0';
-            elsif R_rs1 = A_rd or R_rs2 = A_rd then
-                flg_hazard <= '1';
-            else
-                flg_hazard <= '0';
-            end if;
-        else
-            flg_hazard <= '0';
-        end if;
-    end process;
-    
+        
     --BRANCH
     flg_alu_zero <= '1' when A_alu_result = x"00000000" else '0';
     A_PC_branch <= std_logic_vector(signed(A_PC) + signed(A_imm));
