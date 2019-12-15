@@ -31,9 +31,7 @@ architecture Behavioral of RISCV_top is
     
     component Clock_gen is
         port (
-            clk20 :     out STD_LOGIC;
-            clk10 :     out STD_LOGIC;
-            clk5 :      out STD_LOGIC;
+            clk50 :     out STD_LOGIC;    
             clk_pixel : out STD_LOGIC;
             clksys :    in STD_LOGIC
         );
@@ -101,7 +99,7 @@ architecture Behavioral of RISCV_top is
           
     component UART_driver is
         generic(
-            clk_freq :      integer := 20e6; -- Hz
+            clk_freq :      integer := 50e6; -- Hz
             baud :          integer := 9600; -- bits per sec
             packet_length : integer := 10   -- bits
         );
@@ -142,7 +140,7 @@ architecture Behavioral of RISCV_top is
     
     component LED_driver is
      Generic(
-        clk_freq :      integer := 20e6 -- Hz
+        clk_freq :      integer := 50e6 -- Hz
     );
     Port (  
         clk :       IN STD_LOGIC;
@@ -153,7 +151,7 @@ architecture Behavioral of RISCV_top is
     
     component Btn_driver is
     Generic(
-        clk_freq :          integer := 20e6;     -- Hz
+        clk_freq :          integer := 50e6;     -- Hz
         debounce_period :   integer := 10       -- ms
     );
     Port (
@@ -180,7 +178,7 @@ begin
     Clock : clock_gen 
     port map(
         clksys => basys3_clk,
-        clk20   => clk,
+        clk50   => clk,
         clk_pixel => clk_pixel
     );
     
