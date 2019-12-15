@@ -48,7 +48,7 @@ begin
             when A =>
                 xseg7 <= "0000"&seg7_in(3 downto 0);
                 if mode = '1' then
-                    xseg7(6 downto 5) <= seg7_in(17 downto 16);
+                    xseg7(5 downto 4) <= seg7_in(17 downto 16);
                 end if;
                 an_out <= "1110";
                 if tick = '1' then
@@ -57,7 +57,7 @@ begin
             when B =>
                 xseg7 <= "0000"&seg7_in(7 downto 4);
                 if mode = '1' then
-                    xseg7(6 downto 5) <= seg7_in(19 downto 18);
+                    xseg7(5 downto 4) <= seg7_in(19 downto 18);
                 end if;             
                 an_out <= "1101";
                 if tick = '1' then
@@ -66,7 +66,7 @@ begin
             when C =>
                 xseg7 <= "0000"&seg7_in(11 downto 8);
                 if mode = '1' then
-                    xseg7(6 downto 5) <= seg7_in(21 downto 20);
+                    xseg7(5 downto 4) <= seg7_in(21 downto 20);
                 end if;              
                 an_out <= "1011";
                 if tick = '1' then
@@ -75,7 +75,7 @@ begin
             when D =>
                 xseg7 <= "0000"&seg7_in(15 downto 12);
                 if mode = '1' then
-                    xseg7(6 downto 5) <= seg7_in(23 downto 22);
+                    xseg7(5 downto 4) <= seg7_in(23 downto 22);
                 end if;
                 an_out <= "0111";
                 if tick = '1' then
