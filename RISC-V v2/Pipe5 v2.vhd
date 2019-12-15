@@ -33,7 +33,7 @@ architecture Behavioral of Processor is
     signal ctrl_R_alu_op : STD_LOGIC_VECTOR(1 downto 0);
     signal ctrl_R_alu_src_a_sel, ctrl_R_alu_src_b_sel : STD_LOGIC;
     --Register
-    signal ctrl_R_rd_w_en, ctrl_R_PC4_imm_2reg: STD_LOGIC;
+    signal ctrl_R_rd_w_en, ctrl_R_bypass_ALU: STD_LOGIC;
     --Branch/Jump
     signal ctrl_R_branch, ctrl_R_jump, ctrl_R_sys : STD_LOGIC;
     --Data memory
@@ -44,7 +44,7 @@ architecture Behavioral of Processor is
     signal ctrl_A_alu_op : STD_LOGIC_VECTOR(1 downto 0);
     signal ctrl_A_alu_src_a_sel, ctrl_A_alu_src_b_sel : STD_LOGIC;
     --Register
-    signal ctrl_A_rd_w_en, ctrl_A_PC4_imm_2reg: STD_LOGIC;
+    signal ctrl_A_rd_w_en, ctrl_A_bypass_ALU: STD_LOGIC;
     --Branch/Jump
     signal ctrl_A_branch, ctrl_A_jump : STD_LOGIC;
     --Data memory
@@ -52,7 +52,7 @@ architecture Behavioral of Processor is
     
 -- M Stage
     --Register
-    signal ctrl_M_rd_w_en, ctrl_M_PC4_imm_2reg: STD_LOGIC;
+    signal ctrl_M_rd_w_en, ctrl_M_bypass_ALU: STD_LOGIC;
     signal ctrl_M_jump: STD_LOGIC;
     --Data memory
     signal ctrl_M_mem_w, ctrl_M_mem_r: STD_LOGIC;
@@ -119,7 +119,7 @@ begin
             ctrl_W_mem_r        <= ctrl_M_mem_r;      
                           
             ctrl_M_rd_w_en      <= ctrl_A_rd_w_en;
-            ctrl_M_PC4_imm_2reg <= ctrl_A_PC4_imm_2reg;
+            ctrl_M_bypass_ALU <= ctrl_A_bypass_ALU;
             ctrl_M_mem_w        <= ctrl_A_mem_w;
             ctrl_M_mem_r        <= ctrl_A_mem_r;
             
@@ -129,7 +129,7 @@ begin
                 ctrl_A_alu_src_a_sel    <= '-';
                 ctrl_A_alu_src_b_sel    <= '-';
                 ctrl_A_rd_w_en          <= '0';
-                ctrl_A_PC4_imm_2reg     <= '-';
+                ctrl_A_bypass_ALU     <= '-';
                 ctrl_A_branch           <= '0';
                 ctrl_A_jump             <= '0';
                 ctrl_A_mem_w            <= '0';
@@ -139,7 +139,7 @@ begin
                 ctrl_A_alu_src_a_sel    <= ctrl_R_alu_src_a_sel;
                 ctrl_A_alu_src_b_sel    <= ctrl_R_alu_src_b_sel;
                 ctrl_A_rd_w_en          <= ctrl_R_rd_w_en;
-                ctrl_A_PC4_imm_2reg     <= ctrl_R_PC4_imm_2reg;
+                ctrl_A_bypass_ALU     <= ctrl_R_bypass_ALU;
                 ctrl_A_branch           <= ctrl_R_branch;       
                 ctrl_A_jump             <= ctrl_R_jump;       
                 ctrl_A_mem_w            <= ctrl_R_mem_w;
@@ -307,7 +307,7 @@ begin
         ctrl_R_alu_op <= "00";
     
         ctrl_R_rd_w_en <= '0';
-        ctrl_R_PC4_imm_2reg <= '0';
+        ctrl_R_bypass_ALU <= '0';
         ctrl_R_mem_w <= '0';
         ctrl_R_mem_r <= '0';
     
@@ -322,7 +322,7 @@ begin
                 ctrl_R_alu_src_b_sel <= '1';
                 ctrl_R_rd_w_en <= '1';
                 ctrl_R_mem_r <= '1';
-                ctrl_R_PC4_imm_2reg <= '-';
+                ctrl_R_bypass_ALU <= '-';
             when opcode_imm =>          -- I-type
                 ctrl_R_alu_src_b_sel <= '1';
                 ctrl_R_alu_op <= "11";
@@ -330,17 +330,17 @@ begin
             when opcode_store =>        -- Store
                 ctrl_R_alu_src_b_sel <= '1';
                 ctrl_R_mem_w <= '1';
-                ctrl_R_PC4_imm_2reg <= '-';
+                ctrl_R_bypass_ALU <= '-';
             when opcode_r =>            -- R-type
                 ctrl_R_alu_op <= "10";
                 ctrl_R_rd_w_en <= '1';
             when opcode_branch =>       -- Branch
                 ctrl_R_alu_op <= "01";
                 ctrl_R_branch <= '1';
-                ctrl_R_PC4_imm_2reg <= '-';   
+                ctrl_R_bypass_ALU <= '-';   
             when opcode_sys =>          -- ecall
                 ctrl_R_sys <= '1';
-                ctrl_R_PC4_imm_2reg <= '-';
+                ctrl_R_bypass_ALU <= '-';
                 ctrl_R_alu_src_a_sel <= '-';
                 ctrl_R_alu_src_b_sel <= '-';
                 ctrl_R_alu_op <= "--";
@@ -350,7 +350,7 @@ begin
                 ctrl_R_rd_w_en <= '1';
             when opcode_lui =>          -- lui
                 ctrl_R_rd_w_en <= '1';
-                ctrl_R_PC4_imm_2reg <= '1';
+                ctrl_R_bypass_ALU <= '1';
                 ctrl_R_alu_src_a_sel <= '-';
                 ctrl_R_alu_src_b_sel <= '-';
                 ctrl_R_alu_op <= "--";
@@ -358,10 +358,10 @@ begin
                 ctrl_R_alu_src_b_sel <= '1';
                 ctrl_R_rd_w_en <= '1';
                 ctrl_R_jump <= '1';     
-                ctrl_R_PC4_imm_2reg <= '1';  
+                ctrl_R_bypass_ALU <= '1';  
             when opcode_fence =>        -- fence
                 ctrl_R_sys <= '1';
-                ctrl_R_PC4_imm_2reg <= '-';
+                ctrl_R_bypass_ALU <= '-';
                 ctrl_R_alu_src_a_sel <= '-';
                 ctrl_R_alu_src_b_sel <= '-';
                 ctrl_R_alu_op <= "--";
@@ -370,7 +370,7 @@ begin
                 ctrl_R_alu_src_b_sel <= '1';
                 ctrl_R_rd_w_en <= '1';
                 ctrl_R_jump <= '1';      
-                ctrl_R_PC4_imm_2reg <= '1'; 
+                ctrl_R_bypass_ALU <= '1'; 
             when "0000000" =>
                 -- An all zero opcode counts as a nop
             when others => 
@@ -429,7 +429,7 @@ begin
             A_rd_data_A <= A_imm;
         end if;
         
-        if ctrl_M_PC4_imm_2reg = '1' then
+        if ctrl_M_bypass_ALU = '1' then
             M_rd_data_M <= M_rd_data_A;
         else
             M_rd_data_M <= M_result;
